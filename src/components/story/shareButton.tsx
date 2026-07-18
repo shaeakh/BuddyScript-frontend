@@ -11,9 +11,10 @@ import { LuCheck, LuCopy, LuShare2 } from 'react-icons/lu';
 
 interface ShareButtonProps {
   shareUrl: string; // যে লিঙ্কটি শেয়ার বা কপি করা হবে তা প্রপ হিসেবে আসবে
+  trigger?: React.ReactNode;
 }
 
-const ShareButton = ({ shareUrl }: ShareButtonProps) => {
+const ShareButton = ({ shareUrl, trigger }: ShareButtonProps) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -38,12 +39,16 @@ const ShareButton = ({ shareUrl }: ShareButtonProps) => {
     >
       {/* মডাল ওপেন করার ট্রিগার হিসেবে আমাদের আসল শেয়ার বাটনটি ব্যবহার করা হলো */}
       <DialogTrigger asChild>
-        <button
-          className="p-2 hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
-          title="Share Story"
-        >
-          <LuShare2 className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors" />
-        </button>
+        {trigger ? (
+          trigger
+        ) : (
+          <button
+            className="p-2 hover:bg-accent hover:text-accent-foreground rounded-md transition-colors"
+            title="Share Story"
+          >
+            <LuShare2 className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors" />
+          </button>
+        )}
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-md bg-card border border-border rounded-2xl p-6 shadow-lg animate-in zoom-in-95">

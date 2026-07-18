@@ -9,20 +9,18 @@ import {
   LuEllipsisVertical,
   LuGlobe,
   LuHeart,
-  LuMessageSquare,
   LuPencil,
   LuBell,
   LuEyeOff,
   LuSend,
-  LuSmile,
   LuSparkles,
   LuThumbsUp,
   LuTrash2,
-  LuUser,
 } from 'react-icons/lu';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import ShareButton from './shareButton';
+import SummaryDialog from './SummaryDialog';
 
 interface StoryCardProps {
   story: Story;
@@ -39,6 +37,7 @@ export const StoryCard = ({
 }: StoryCardProps) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [newCommentText, setNewCommentText] = useState('');
   const menuRef = useRef<HTMLDivElement>(null);
@@ -133,6 +132,15 @@ export const StoryCard = ({
   const username = story?.user?.username || 'user';
   const authorName = story?.user?.name || 'Anonymous';
 
+  const sortedComments = story?.comments?.length
+    ? [...story.comments].sort((a, b) => {
+        const timeA = a.created_at ? new Date(a.created_at).getTime() : a.id;
+        const timeB = b.created_at ? new Date(b.created_at).getTime() : b.id;
+        return timeB - timeA;
+      })
+    : [];
+  const mostRecentComment = sortedComments[0];
+
   return (
     <div className="bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-all p-4 sm:p-5 relative space-y-4">
       {/* ─── POST HEADER ─── */}
@@ -172,7 +180,10 @@ export const StoryCard = ({
         <div className="flex items-center gap-1.5" ref={menuRef}>
           {story?.summary && (
             <button
-              onClick={() => onSummaryClick?.(story.summary)}
+              onClick={() => {
+                setIsSummaryOpen(true);
+                onSummaryClick?.(story.summary);
+              }}
               className="flex items-center gap-1 px-2.5 py-1 bg-primary/10 text-primary hover:bg-primary/20 rounded-full text-xs font-semibold transition"
               title="View AI Summary"
             >
@@ -290,43 +301,150 @@ export const StoryCard = ({
           >
             {story?.comments?.length || 0} Comment
           </button>
-          <span>122 Share</span>
+          <span>0 Share</span>
         </div>
       </div>
 
-      {/* ─── INTERACTIVE ACTIONS BAR ─── */}
-      <div className="grid grid-cols-3 gap-1 pt-1 border-t border-border">
+      {/* ─── INTERACTIVE ACTIONS BAR (Styled matching feed.html) ─── */}
+      <div className="grid grid-cols-3 gap-1 pt-1.5 border-t border-border">
         <button
           onClick={() => handleVoteAction('UPVOTE')}
-          className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition ${
+          className={`flex items-center justify-center gap-2 py-2.5 text-xs font-semibold rounded-lg transition-colors ${
             isUpvoted
-              ? 'bg-primary/10 text-primary'
-              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              ? 'bg-primary/10 text-primary hover:bg-primary/20'
+              : 'text-foreground/80 hover:bg-muted hover:text-foreground'
           }`}
         >
-          <LuSmile className="w-4 h-4" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="19"
+            height="19"
+            fill="none"
+            viewBox="0 0 19 19"
+            className="shrink-0"
+          >
+            <path fill="#FFCC4D" d="M9.5 19a9.5 9.5 0 100-19 9.5 9.5 0 000 19z" />
+            <path
+              fill="#664500"
+              d="M9.5 11.083c-1.912 0-3.181-.222-4.75-.527-.358-.07-1.056 0-1.056 1.055 0 2.111 2.425 4.75 5.806 4.75 3.38 0 5.805-2.639 5.805-4.75 0-1.055-.697-1.125-1.055-1.055-1.57.305-2.838.527-4.75.527z"
+            />
+            <path
+              fill="#fff"
+              d="M4.75 11.611s1.583.528 4.75.528 4.75-.528 4.75-.528-1.056 2.111-4.75 2.111-4.75-2.11-4.75-2.11z"
+            />
+            <path
+              fill="#664500"
+              d="M6.333 8.972c.729 0 1.32-.827 1.32-1.847s-.591-1.847-1.32-1.847c-.729 0-1.32.827-1.32 1.847s.591 1.847 1.32 1.847zM12.667 8.972c.729 0 1.32-.827 1.32-1.847s-.591-1.847-1.32-1.847c-.729 0-1.32.827-1.32 1.847s.591 1.847 1.32 1.847z"
+            />
+          </svg>
           <span>{isUpvoted ? 'Haha' : 'React'}</span>
         </button>
 
         <button
           onClick={() => setShowComments(!showComments)}
-          className="flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition"
+          className="flex items-center justify-center gap-2 py-2.5 text-xs font-semibold text-foreground/80 hover:bg-muted hover:text-foreground rounded-lg transition-colors"
         >
-          <LuMessageSquare className="w-4 h-4" />
+          <svg
+            className="w-5 h-5 stroke-current"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 21 21"
+          >
+            <path
+              stroke="currentColor"
+              d="M1 10.5c0-.464 0-.696.009-.893A9 9 0 019.607 1.01C9.804 1 10.036 1 10.5 1v0c.464 0 .696 0 .893.009a9 9 0 018.598 8.598c.009.197.009.429.009.893v6.046c0 1.36 0 2.041-.317 2.535a2 2 0 01-.602.602c-.494.317-1.174.317-2.535.317H10.5c-.464 0-.696 0-.893-.009a9 9 0 01-8.598-8.598C1 11.196 1 10.964 1 10.5v0z"
+            />
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6.938 9.313h7.125M10.5 14.063h3.563"
+            />
+          </svg>
           <span>Comment</span>
         </button>
 
-        <div className="flex items-center justify-center">
-          <ShareButton
-            shareUrl={`${EnvConstants.FRONTEND_URL}/story/${story?.id}`}
-          />
-        </div>
+        <ShareButton
+          shareUrl={`${EnvConstants.FRONTEND_URL}/story/${story?.id}`}
+          trigger={
+            <button
+              type="button"
+              className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-semibold text-foreground/80 hover:bg-muted hover:text-foreground rounded-lg transition-colors"
+            >
+              <svg
+                className="w-5 h-5 stroke-current"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 21"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinejoin="round"
+                  d="M23 10.5L12.917 1v5.429C3.267 6.429 1 13.258 1 20c2.785-3.52 5.248-5.429 11.917-5.429V20L23 10.5z"
+                />
+              </svg>
+              <span>Share</span>
+            </button>
+          }
+        />
       </div>
 
-      {/* ─── COLLAPSIBLE COMMENTS SECTION ─── */}
+      {/* ─── MOST RECENT COMMENT PREVIEW (Shown by default) ─── */}
+      {story?.comments && story.comments.length > 0 && mostRecentComment && (
+        <div className="pt-3 border-t border-border space-y-2">
+          {story.comments.length > 1 ? (
+            <button
+              onClick={() => navigate(`/story/${story.id}`)}
+              className="text-xs text-primary font-medium hover:underline block"
+            >
+              View {story.comments.length - 1} previous comment
+              {story.comments.length - 1 > 1 ? 's' : ''}
+            </button>
+          ) : null}
+
+          <div
+            key={mostRecentComment.id}
+            className="flex items-start gap-2.5 bg-muted/30 p-2.5 rounded-xl border border-border/50 text-xs"
+          >
+            <UserAvatar
+              userId={mostRecentComment.userId || mostRecentComment.user?.id}
+              username={mostRecentComment.user?.username || mostRecentComment.user?.name}
+              className="w-7 h-7 text-[10px]"
+            />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-foreground truncate">
+                  {mostRecentComment.user?.name || 'Anonymous User'}
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  {mostRecentComment.created_at
+                    ? new Date(mostRecentComment.created_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })
+                    : 'Recent'}
+                </span>
+              </div>
+              <p className="text-muted-foreground mt-0.5">
+                {mostRecentComment.body}
+              </p>
+              <div className="flex items-center gap-3 mt-1.5 text-[10px] text-muted-foreground font-medium">
+                <button className="hover:text-primary">Like</button>
+                <button className="hover:text-primary">Reply</button>
+                <span className="flex items-center gap-1 text-primary">
+                  <LuThumbsUp className="w-3 h-3" />
+                  <LuHeart className="w-3 h-3 text-rose-500 fill-rose-500" />
+                  0
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── ADD COMMENT INPUT (Toggled by Comment button) ─── */}
       {showComments && (
-        <div className="pt-3 border-t border-border space-y-3 animate-in fade-in duration-200">
-          {/* Add Comment Input */}
+        <div className="pt-2 space-y-3 animate-in fade-in duration-200">
           <div className="flex items-center gap-2">
             <UserAvatar
               userId={currentUserId}
@@ -354,57 +472,18 @@ export const StoryCard = ({
               </button>
             </div>
           </div>
-
-          {/* Comment Tree Preview */}
-          {story?.comments && story.comments.length > 0 && (
-            <div className="space-y-2 pt-1">
-              <button
-                onClick={() => navigate(`/story/${story.id}`)}
-                className="text-xs text-primary font-medium hover:underline"
-              >
-                View all {story.comments.length} comments
-              </button>
-
-              {story.comments.slice(0, 2).map((comment) => (
-                <div
-                  key={comment.id}
-                  className="flex items-start gap-2.5 bg-muted/30 p-2.5 rounded-xl border border-border/50 text-xs"
-                >
-                  <UserAvatar
-                    userId={comment.userId || comment.user?.id}
-                    username={comment.user?.username || comment.user?.name}
-                    className="w-7 h-7 text-[10px]"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-foreground truncate">
-                        {comment.user?.name || 'Anonymous User'}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">
-                        21m
-                      </span>
-                    </div>
-                    <p className="text-muted-foreground mt-0.5">
-                      {comment.body}
-                    </p>
-                    <div className="flex items-center gap-3 mt-1.5 text-[10px] text-muted-foreground font-medium">
-                      <button className="hover:text-primary">Like</button>
-                      <button className="hover:text-primary">Reply</button>
-                      <span className="flex items-center gap-1 text-primary">
-                        <LuThumbsUp className="w-3 h-3" />
-                        <LuHeart className="w-3 h-3 text-rose-500 fill-rose-500" />
-                        198
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       )}
+
+      {/* ─── SUMMARY DIALOG MODAL ─── */}
+      <SummaryDialog
+        isOpen={isSummaryOpen}
+        onOpenChange={setIsSummaryOpen}
+        summary={story?.summary || null}
+      />
     </div>
   );
 };
 
 export default StoryCard;
+

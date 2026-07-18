@@ -1,5 +1,6 @@
 import { ProtectedLayout, PublicLayout } from '@/components/Layout';
 import Auth from '@/pages/Auth';
+import Chat from '@/pages/Chat';
 import Home from '@/pages/Home';
 import Landing from '@/pages/Landing';
 import Login from '@/pages/Login';
@@ -48,6 +49,10 @@ export const router = createBrowserRouter([
       {
         path: '/home',
         element: <Home />,
+      },
+      {
+        path: '/chat',
+        element: <Chat />,
       },
       {
         path: '/settings',

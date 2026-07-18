@@ -1,20 +1,25 @@
 import NavBar from '@/components/layoutComponents/NavBar';
+import ThemeToggle from '@/components/layoutComponents/ThemeToggle';
 
+import { ThemeProvider } from '@/providers/ThemeProvider';
 import { ToastProvider } from '@/providers/ToastProvider';
 import { isAuthenticated } from '@/utils/localStorageUtils';
 import { Navigate, Outlet } from 'react-router-dom';
 
 const AppShell = ({ auth }: { auth: boolean }) => (
-  <ToastProvider>
-    <div className="flex flex-col min-h-screen bg-background">
-      <div className="sticky top-0 z-50">{auth && <NavBar />}</div>
-      <div className="flex flex-1">
-        <main className="flex-1 pt-0 ">
-          <Outlet />
-        </main>
+  <ThemeProvider>
+    <ToastProvider>
+      <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-200">
+        <div className="sticky top-0 z-50">{auth && <NavBar />}</div>
+        <div className="flex flex-1">
+          <main className="flex-1 pt-0">
+            <Outlet />
+          </main>
+        </div>
+        <ThemeToggle />
       </div>
-    </div>
-  </ToastProvider>
+    </ToastProvider>
+  </ThemeProvider>
 );
 
 export const ProtectedLayout = () => {

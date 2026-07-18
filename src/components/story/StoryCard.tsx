@@ -21,6 +21,7 @@ import {
   LuUser,
 } from 'react-icons/lu';
 import { Link, useNavigate } from 'react-router-dom';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 import ShareButton from './shareButton';
 
 interface StoryCardProps {
@@ -54,11 +55,13 @@ export const StoryCard = ({
 
   let canManage = false;
   let currentUserId: number | null = null;
+  let currentUserUsername: string | null = null;
 
   if (isAuthenticated()) {
     try {
       const currentUser = getUserPayload();
       currentUserId = currentUser?.id ?? null;
+      currentUserUsername = currentUser?.username || currentUser?.name || null;
       const isOwner = currentUser?.id === story?.userId;
       const isAdmin = currentUser?.role === 'ADMIN';
       canManage = isOwner || isAdmin;
@@ -137,17 +140,13 @@ export const StoryCard = ({
         <div className="flex items-center gap-3 min-w-0">
           <Link
             to={`/profile/${username}`}
-            className="w-10 h-10 rounded-full bg-muted flex items-center justify-center border border-border overflow-hidden shrink-0 hover:border-primary/50 transition-colors"
+            className="shrink-0 hover:opacity-90 transition-opacity"
           >
-            <img
-              src="/assets/images/post_img.png"
-              alt={authorName}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLElement).style.display = 'none';
-              }}
+            <UserAvatar
+              userId={story?.userId ?? story?.user?.id}
+              username={story?.user?.username || story?.user?.name || authorName}
+              className="w-10 h-10 text-sm"
             />
-            <LuUser className="w-5 h-5 text-muted-foreground" />
           </Link>
 
           <div className="min-w-0">
@@ -329,10 +328,10 @@ export const StoryCard = ({
         <div className="pt-3 border-t border-border space-y-3 animate-in fade-in duration-200">
           {/* Add Comment Input */}
           <div className="flex items-center gap-2">
-            <img
-              src="/assets/images/comment_img.png"
-              alt="Commenter"
-              className="w-8 h-8 rounded-full object-cover shrink-0"
+            <UserAvatar
+              userId={currentUserId}
+              username={currentUserUsername}
+              className="w-8 h-8 text-xs"
             />
             <div className="flex-1 relative">
               <input
@@ -371,10 +370,10 @@ export const StoryCard = ({
                   key={comment.id}
                   className="flex items-start gap-2.5 bg-muted/30 p-2.5 rounded-xl border border-border/50 text-xs"
                 >
-                  <img
-                    src="/assets/images/txt_img.png"
-                    alt={comment.user?.name || 'User'}
-                    className="w-7 h-7 rounded-full object-cover shrink-0 border border-border"
+                  <UserAvatar
+                    userId={comment.userId || comment.user?.id}
+                    username={comment.user?.username || comment.user?.name}
+                    className="w-7 h-7 text-[10px]"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">

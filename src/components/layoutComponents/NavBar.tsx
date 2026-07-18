@@ -1,31 +1,37 @@
 import SearchBar from '@/components/search/SearchBar';
 import { useSignOut } from '@/hooks/auth/useSignOut';
 import { getUserPayload } from '@/utils/localStorageUtils';
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   LuBell,
   LuChevronDown,
   LuCircleHelp,
   LuHouse,
+  LuLoaderCircle,
   LuLogOut,
   LuMessageSquare,
   LuSearch,
   LuSettings,
   LuUser,
   LuUsers,
-  LuLoaderCircle,
 } from 'react-icons/lu';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 import { Link, NavLink } from 'react-router-dom';
 
 const NavBar = () => {
-  const [username] = useState(() => {
+  const [userData] = useState(() => {
     try {
       const payload = getUserPayload();
-      return payload?.username || 'Dylan Field';
+      return {
+        id: payload?.id ?? 5,
+        username: payload?.username || payload?.name || 'Dylan Field',
+      };
     } catch {
-      return 'Dylan Field';
+      return { id: 5, username: 'Dylan Field' };
     }
   });
+
+  const { id: userId, username } = userData;
 
   const { handleSignOut, loading: isLoggingOut } = useSignOut();
 
@@ -75,7 +81,7 @@ const NavBar = () => {
           <div className="flex-1 max-w-md mx-auto hidden md:block">
             <SearchBar
               placeholder="input search text"
-              className="w-full bg-muted/40 border border-border rounded-full py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full bg-muted/40 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
 
@@ -171,8 +177,8 @@ const NavBar = () => {
                         />
                         <div className="min-w-0 flex-1">
                           <p className="text-xs text-foreground leading-snug">
-                            <span className="font-bold">Steve Jobs</span> posted a
-                            link in your timeline.
+                            <span className="font-bold">Steve Jobs</span> posted
+                            a link in your timeline.
                           </p>
                           <span className="text-[10px] text-primary font-medium">
                             42 minutes ago
@@ -228,10 +234,10 @@ const NavBar = () => {
                 }}
                 className="flex items-center gap-2 p-1 rounded-full hover:bg-muted transition"
               >
-                <img
-                  src="/assets/images/profile.png"
-                  alt="Dylan Field"
-                  className="w-8 h-8 rounded-full object-cover border border-border"
+                <UserAvatar
+                  userId={userId}
+                  username={username}
+                  className="w-8 h-8 text-xs"
                 />
                 <span className="text-xs font-semibold text-foreground hidden lg:inline-block">
                   {username || 'Dylan Field'}
@@ -243,10 +249,10 @@ const NavBar = () => {
               {isProfileOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-xl shadow-2xl p-2 z-50 space-y-1 animate-in fade-in zoom-in duration-150">
                   <div className="flex items-center gap-3 p-2 border-b border-border mb-1">
-                    <img
-                      src="/assets/images/profile.png"
-                      alt={username}
-                      className="w-9 h-9 rounded-full object-cover border border-border"
+                    <UserAvatar
+                      userId={userId}
+                      username={username}
+                      className="w-9 h-9 text-xs"
                     />
                     <div className="min-w-0 flex-1">
                       <h5 className="text-xs font-bold text-foreground truncate">

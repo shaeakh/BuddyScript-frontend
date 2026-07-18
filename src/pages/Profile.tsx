@@ -1,5 +1,6 @@
 import StoryCard from '@/components/story/StoryCard';
 import SummaryDialog from '@/components/story/SummaryDialog';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 import { useFetchProfile } from '@/hooks/profile/useFetchProfile';
 import { getUserPayload } from '@/utils/localStorageUtils';
 import { useState } from 'react';
@@ -72,9 +73,11 @@ const Profile = () => {
       {/* ─── Profile Header Section ─── */}
       <div className="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-sm relative overflow-hidden">
         <div className="relative flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 mt-4">
-          <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-background border-4 border-card shadow-sm flex items-center justify-center shrink-0">
-            <LuUser className="w-10 h-10 text-muted-foreground" />
-          </div>
+          <UserAvatar
+            userId={profile.id}
+            username={profile.username || profile.name}
+            className="w-20 h-20 md:w-24 md:h-24 text-2xl md:text-3xl border-4 border-card shadow-sm"
+          />
 
           <div className="flex-1 text-center md:text-left space-y-3">
             <div>

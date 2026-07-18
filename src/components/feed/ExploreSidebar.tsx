@@ -80,7 +80,7 @@ export const ExploreSidebar: React.FC = () => {
                 <LuBookOpen className="w-5 h-5 text-primary" />
                 <span>Learning</span>
               </div>
-              <span className="text-[10px] font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-normal bg-[#0ACF83] text-white px-2 py-0.5 rounded-md">
                 New
               </span>
             </a>
@@ -130,7 +130,7 @@ export const ExploreSidebar: React.FC = () => {
                 <LuGamepad2 className="w-5 h-5" />
                 <span>Gaming</span>
               </div>
-              <span className="text-[10px] font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-normal bg-[#0ACF83] text-white px-2 py-0.5 rounded-md">
                 New
               </span>
             </a>
@@ -191,7 +191,7 @@ export const ExploreSidebar: React.FC = () => {
               </div>
               <button
                 type="button"
-                className="px-3 py-1 text-xs font-medium border border-primary text-primary hover:bg-primary hover:text-primary-foreground rounded-lg transition shrink-0"
+                className="px-3 py-1 text-xs font-medium border border-border text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary rounded-lg transition shrink-0"
               >
                 Connect
               </button>
@@ -225,11 +225,11 @@ export const ExploreSidebar: React.FC = () => {
               />
             </div>
             <div className="flex items-start gap-3">
-              <div className="bg-primary/10 border border-primary/20 text-center rounded-lg px-2.5 py-1 shrink-0">
-                <span className="block text-base font-bold text-primary leading-tight">
+              <div className="bg-[#0ACF83] text-white text-center rounded-lg px-2.5 py-1 shrink-0">
+                <span className="block text-base font-bold text-white leading-tight">
                   {evt.day}
                 </span>
-                <span className="block text-[10px] font-semibold uppercase text-primary">
+                <span className="block text-[10px] font-semibold uppercase text-white">
                   {evt.month}
                 </span>
               </div>
@@ -245,7 +245,7 @@ export const ExploreSidebar: React.FC = () => {
               </span>
               <button
                 type="button"
-                className="px-3 py-1 bg-primary text-primary-foreground text-xs font-medium rounded-md hover:bg-primary/90 transition"
+                className="px-3 py-1 bg-[#F3F9FF] border border-primary text-primary text-xs font-medium rounded-md hover:bg-primary hover:text-primary-foreground transition"
               >
                 Going
               </button>

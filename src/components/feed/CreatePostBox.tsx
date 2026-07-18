@@ -1,6 +1,8 @@
 import React from 'react';
 import { LuImage, LuVideo, LuCalendar, LuFileText, LuSend } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
+import { getUserPayload } from '@/utils/localStorageUtils';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 
 interface CreatePostBoxProps {
   userAvatar?: string;
@@ -8,10 +10,13 @@ interface CreatePostBoxProps {
 }
 
 export const CreatePostBox: React.FC<CreatePostBoxProps> = ({
-  userAvatar = '/assets/images/txt_img.png',
   onPostClick,
 }) => {
   const navigate = useNavigate();
+
+  const userPayload = getUserPayload();
+  const userId = userPayload?.id;
+  const username = userPayload?.username || userPayload?.name;
 
   const handleCreateClick = () => {
     if (onPostClick) {
@@ -24,10 +29,10 @@ export const CreatePostBox: React.FC<CreatePostBoxProps> = ({
   return (
     <div className="bg-card border border-border rounded-xl p-4 sm:p-5 shadow-sm space-y-4">
       <div className="flex items-start gap-3">
-        <img
-          src={userAvatar}
-          alt="Profile Avatar"
-          className="w-10 h-10 rounded-full object-cover shrink-0 border border-border"
+        <UserAvatar
+          userId={userId}
+          username={username}
+          className="w-10 h-10 text-xs"
         />
         <div className="flex-1 relative">
           <textarea

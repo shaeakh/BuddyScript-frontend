@@ -1,5 +1,5 @@
 import React from 'react';
-import { LuPlus, LuChevronRight } from 'react-icons/lu';
+import { LuChevronRight, LuPlus } from 'react-icons/lu';
 
 interface StoryItem {
   id: number;
@@ -54,11 +54,13 @@ export const StoriesCarousel: React.FC = () => {
               alt="Your Story"
               className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-2.5 items-center text-center">
+            <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-2.5 items-center text-center">
               <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center -mt-4 mb-1 border-2 border-card shadow">
                 <LuPlus className="w-4 h-4" />
               </div>
-              <span className="text-xs font-semibold text-white">Your Story</span>
+              <span className="text-xs font-semibold text-white">
+                Your Story
+              </span>
             </div>
           </div>
 
@@ -73,7 +75,7 @@ export const StoriesCarousel: React.FC = () => {
                 alt={story.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
               />
-              <div className="absolute top-2.5 left-2.5">
+              <div className="absolute top-2.5 right-2.5 z-10">
                 <img
                   src={story.avatar}
                   alt={story.name}
@@ -82,7 +84,7 @@ export const StoriesCarousel: React.FC = () => {
                   }`}
                 />
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2.5">
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent flex items-end p-2.5">
                 <span className="text-xs font-semibold text-white truncate">
                   {story.name}
                 </span>
@@ -107,7 +109,9 @@ export const StoriesCarousel: React.FC = () => {
                 <LuPlus className="w-3 h-3" />
               </div>
             </div>
-            <span className="text-[11px] font-medium text-foreground">Your Story</span>
+            <span className="text-[11px] font-medium text-foreground">
+              Your Story
+            </span>
           </div>
 
           {/* Friend Story Bubbles */}

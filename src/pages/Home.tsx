@@ -63,7 +63,7 @@ const Home = () => {
   };
 
   return (
-    <div className="max-w-screen-2xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+    <div className="max-w-[1240px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* ─── LEFT SIDEBAR (EXPLORE, SUGGESTIONS, EVENTS) ─── */}
         <aside className="hidden lg:block lg:col-span-3">

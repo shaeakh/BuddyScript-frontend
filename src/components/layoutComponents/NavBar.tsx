@@ -59,7 +59,7 @@ const NavBar = () => {
     <>
       {/* ─── DESKTOP HEADER NAVBAR ─── */}
       <header className="sticky top-0 z-50 w-full bg-card border-b border-border shadow-xs">
-        <div className="max-w-screen-2xl mx-auto px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="w-full max-w-[1240px] mx-auto flex h-16 items-center justify-between px-4 sm:px-6">
           {/* 1. Left Logo */}
           <div className="flex items-center shrink-0">
             <Link to="/home" className="flex items-center gap-2">

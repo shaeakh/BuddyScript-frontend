@@ -1,138 +1,133 @@
-import { useSignIn } from '@/hooks/auth/useSignIn';
-import { useState } from 'react';
-import {
-  LuEye,
-  LuEyeOff,
-  LuLoaderCircle,
-  LuLock,
-  LuMail,
-} from 'react-icons/lu';
+import type { SignInRequest } from '@/types/api/authTypes';
+import { Link } from 'react-router-dom';
+import { LuLoaderCircle } from 'react-icons/lu';
 
 interface SignInCardProps {
-  onToggle: () => void;
+  form: SignInRequest;
+  loading: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSubmit: (e: React.FormEvent) => void;
 }
 
-const SignInCard = ({ onToggle }: SignInCardProps) => {
-  const { form, loading, handleChange, handleSubmit } = useSignIn();
-
-  // UI-only state stays in the component
-  const [showPassword, setShowPassword] = useState(false);
-
+const SignInCard = ({ form, loading, onChange, onSubmit }: SignInCardProps) => {
   return (
-    <div className="relative w-full max-w-md">
-      <div className="bg-card border border-border rounded-xl shadow-xl p-8 space-y-4 z-10 relative">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-foreground font-sans">
-            Welcome back
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Sign in to continue to your account
-          </p>
+    <div className="w-full bg-theme-bg2 dark:bg-card p-6 sm:p-12 rounded-md border border-border/50 shadow-md">
+      {/* Logo */}
+      <div className="mb-7 flex justify-center">
+        <img
+          src="/assets/images/logo.svg"
+          alt="Buddy Script Logo"
+          className="h-10 w-auto"
+        />
+      </div>
+
+      {/* Title */}
+      <p className="text-center text-theme-color dark:text-muted-foreground text-sm mb-2 font-normal">
+        Welcome back
+      </p>
+      <h4 className="text-center text-2xl font-bold text-foreground mb-8">
+        Login to your account
+      </h4>
+
+      {/* Google Sign In Button */}
+      <button
+        type="button"
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-theme-bcolor1 dark:border-border bg-theme-bg2 dark:bg-secondary rounded-md text-theme-color2 dark:text-secondary-foreground font-medium text-sm hover:shadow-sm transition-all mb-8 cursor-pointer"
+      >
+        <img
+          src="/assets/images/google.svg"
+          alt="Google"
+          className="w-5 h-5"
+        />
+        <span>Or sign-in with google</span>
+      </button>
+
+      {/* Divider */}
+      <div className="relative text-center my-6 text-sm text-theme-color3 dark:text-muted-foreground before:content-[''] before:absolute before:left-0 before:top-1/2 before:w-[38%] before:h-[1px] before:bg-theme-bg4 dark:before:bg-border after:content-[''] after:absolute after:right-0 after:top-1/2 after:w-[38%] after:h-[1px] after:bg-theme-bg4 dark:after:bg-border">
+        <span>Or</span>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <label
+            htmlFor="email"
+            className="text-sm font-medium text-theme-color4 dark:text-foreground"
+          >
+            Email
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            value={form.email}
+            onChange={onChange}
+            placeholder="Enter your email"
+            className="w-full h-12 px-4 rounded-md border border-theme-bcolor2 dark:border-border bg-theme-bg2 dark:bg-input text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-theme-color5 transition-all"
+          />
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Email */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="email"
-              className="text-sm font-medium text-foreground"
-            >
-              Email address
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-muted-foreground">
-                <LuMail className="w-4 h-4" />
-              </div>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-                value={form.email}
-                onChange={handleChange}
-                placeholder="you@example.com"
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
-              />
-            </div>
-          </div>
-
-          {/* Password */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="password"
-                className="text-sm font-medium text-foreground"
-              >
-                Password
-              </label>
-              <button
-                type="button"
-                className="text-xs text-primary hover:text-primary/80 font-medium transition-colors"
-              >
-                Forgot password?
-              </button>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-muted-foreground">
-                <LuLock className="w-4 h-4" />
-              </div>
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                required
-                autoComplete="current-password"
-                value={form.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-                className="w-full pl-10 pr-11 py-2.5 rounded-lg bg-input border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((p) => !p)}
-                className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? (
-                  <LuEyeOff className="w-4 h-4" />
-                ) : (
-                  <LuEye className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 px-4 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-card disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+        <div className="flex flex-col gap-2">
+          <label
+            htmlFor="password"
+            className="text-sm font-medium text-theme-color4 dark:text-foreground"
           >
-            {loading ? (
-              <>
-                <LuLoaderCircle className="w-4 h-4 animate-spin" />
-                Signing in…
-              </>
-            ) : (
-              'Sign in'
-            )}
-          </button>
-        </form>
+            Password
+          </label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            value={form.password}
+            onChange={onChange}
+            placeholder="Enter your password"
+            className="w-full h-12 px-4 rounded-md border border-theme-bcolor2 dark:border-border bg-theme-bg2 dark:bg-input text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-theme-color5 transition-all"
+          />
+        </div>
 
-        {/* Footer */}
-        <p className="text-center text-sm text-muted-foreground">
-          Don't have an account?{' '}
-          <button
-            type="button"
-            onClick={onToggle}
-            className="text-primary hover:text-primary/80 font-semibold transition-colors"
-          >
-            Create one
-          </button>
-        </p>
-      </div>
+        <div className="flex items-center justify-between text-sm mt-1 mb-4">
+          <label className="flex items-center gap-2 text-theme-color dark:text-foreground text-sm cursor-pointer">
+            <input
+              type="checkbox"
+              name="remember"
+              defaultChecked
+              className="w-4 h-4 accent-theme-color5 rounded"
+            />
+            Remember me
+          </label>
+          <span className="text-theme-color5 dark:text-primary hover:underline cursor-pointer">
+            Forgot password?
+          </span>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3 bg-[#1890FF] hover:bg-[#007be5] text-white font-medium rounded-md transition-all flex items-center justify-center gap-2 text-base shadow-md mb-6 disabled:opacity-60 cursor-pointer"
+        >
+          {loading ? (
+            <>
+              <LuLoaderCircle className="w-5 h-5 animate-spin text-white" />
+              Logging in...
+            </>
+          ) : (
+            'Login now'
+          )}
+        </button>
+      </form>
+
+      {/* Footer link */}
+      <p className="text-center text-sm text-theme-color dark:text-muted-foreground">
+        Dont have an account?{' '}
+        <Link
+          to="/auth/registration"
+          className="text-theme-color5 font-semibold hover:underline"
+        >
+          Create New Account
+        </Link>
+      </p>
     </div>
   );
 };

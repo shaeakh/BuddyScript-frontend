@@ -2,6 +2,58 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
+@font-face {
+  font-family: 'Flaticon';
+  src: url('/assets/fonts/flaticon/Flaticon.eot');
+  src: url('/assets/fonts/flaticon/Flaticon.eot?#iefix') format('embedded-opentype'),
+       url('/assets/fonts/flaticon/Flaticon.woff2') format('woff2'),
+       url('/assets/fonts/flaticon/Flaticon.woff') format('woff'),
+       url('/assets/fonts/flaticon/Flaticon.ttf') format('truetype'),
+       url('/assets/fonts/flaticon/Flaticon.svg#Flaticon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Font Awesome 5 Brands';
+  src: url('/assets/fonts/fa-brands-400.eot');
+  src: url('/assets/fonts/fa-brands-400.eot?#iefix') format('embedded-opentype'),
+       url('/assets/fonts/fa-brands-400.woff2') format('woff2'),
+       url('/assets/fonts/fa-brands-400.woff') format('woff'),
+       url('/assets/fonts/fa-brands-400.ttf') format('truetype'),
+       url('/assets/fonts/fa-brands-400.svg#fontawesome') format('svg');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Font Awesome 5 Free';
+  src: url('/assets/fonts/fa-regular-400.eot');
+  src: url('/assets/fonts/fa-regular-400.eot?#iefix') format('embedded-opentype'),
+       url('/assets/fonts/fa-regular-400.woff2') format('woff2'),
+       url('/assets/fonts/fa-regular-400.woff') format('woff'),
+       url('/assets/fonts/fa-regular-400.ttf') format('truetype'),
+       url('/assets/fonts/fa-regular-400.svg#fontawesome') format('svg');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Font Awesome 5 Free';
+  src: url('/assets/fonts/fa-solid-900.eot');
+  src: url('/assets/fonts/fa-solid-900.eot?#iefix') format('embedded-opentype'),
+       url('/assets/fonts/fa-solid-900.woff2') format('woff2'),
+       url('/assets/fonts/fa-solid-900.woff') format('woff'),
+       url('/assets/fonts/fa-solid-900.ttf') format('truetype'),
+       url('/assets/fonts/fa-solid-900.svg#fontawesome') format('svg');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @layer base {
@@ -45,10 +97,11 @@
     --sidebar-border: oklch(0.9401 0 0);
     --sidebar-ring: oklch(0 0 0);
     --font-sans:
-      ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+      'Poppins', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
       Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
       'Noto Color Emoji';
+    --font-poppins: 'Poppins', sans-serif;
     --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
     --font-mono:
       ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
@@ -177,6 +230,7 @@
     --color-sidebar-ring: var(--sidebar-ring);
 
     --font-sans: var(--font-sans);
+    --font-poppins: var(--font-poppins);
     --font-mono: var(--font-mono);
     --font-serif: var(--font-serif);
     --font-jetbrains: var(--font-jetbrains);
@@ -187,16 +241,16 @@
     --radius-xl: calc(var(--radius) + 4px);
 
     /* Custom Theme Mapping */
-    --color-theme: var(--theme-color);
-    --color-theme-1: var(--theme-color1);
-    --color-theme-2: var(--theme-color2);
-    --color-theme-3: var(--theme-color3);
-    --color-theme-4: var(--theme-color4);
-    --color-theme-5: var(--theme-color5);
-    --color-theme-6: var(--theme-color6);
-    --color-theme-7: var(--theme-color7);
-    --color-theme-8: var(--theme-color8);
-    --color-theme-9: var(--theme-color9);
+    --color-theme-color: var(--theme-color);
+    --color-theme-color1: var(--theme-color1);
+    --color-theme-color2: var(--theme-color2);
+    --color-theme-color3: var(--theme-color3);
+    --color-theme-color4: var(--theme-color4);
+    --color-theme-color5: var(--theme-color5);
+    --color-theme-color6: var(--theme-color6);
+    --color-theme-color7: var(--theme-color7);
+    --color-theme-color8: var(--theme-color8);
+    --color-theme-color9: var(--theme-color9);
     --color-theme-bg1: var(--theme-bg1);
     --color-theme-bg2: var(--theme-bg2);
     --color-theme-bg3: var(--theme-bg3);

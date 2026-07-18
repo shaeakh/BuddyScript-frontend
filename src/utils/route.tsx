@@ -1,12 +1,14 @@
 import { ProtectedLayout, PublicLayout } from '@/components/Layout';
 import EditStory from '@/pages/Story/EditStory';
 import Auth from '@/pages/Auth';
+import Login from '@/pages/Login';
+import Registration from '@/pages/Registration';
 import Home from '@/pages/Home';
 import Landing from '@/pages/Landing';
 import Profile from '@/pages/Profile';
 import Search from '@/pages/Search';
 import Settings from '@/pages/Settings';
-import CreateStory from '@/pages/Story/CreateStory'; // ← নতুন
+import CreateStory from '@/pages/Story/CreateStory';
 import StoryDetails from '@/pages/Story/StoryDetails';
 import { createBrowserRouter } from 'react-router-dom';
 
@@ -21,6 +23,14 @@ export const router = createBrowserRouter([
       {
         path: '/auth',
         element: <Auth />,
+      },
+      {
+        path: '/auth/login',
+        element: <Login />,
+      },
+      {
+        path: '/auth/registration',
+        element: <Registration />,
       },
     ],
   },
@@ -44,8 +54,8 @@ export const router = createBrowserRouter([
         element: <Settings />,
       },
       { path: '/story/create', element: <CreateStory /> },
-      { path: '/story/edit/:id', element: <EditStory /> }, // ← নতুন
-      { path: '/story/:storyid', element: <StoryDetails /> }, // ← নতুন
+      { path: '/story/edit/:id', element: <EditStory /> },
+      { path: '/story/:storyid', element: <StoryDetails /> },
     ],
   },
   {

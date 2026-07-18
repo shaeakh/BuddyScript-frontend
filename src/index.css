@@ -58,14 +58,14 @@
 
 @layer base {
   :root {
-    --background: oklch(0.994 0 0);
+    --background: #F0F2F5;
     --foreground: oklch(0 0 0);
     --card: oklch(0.994 0 0);
     --card-foreground: oklch(0 0 0);
     --popover: oklch(0.9911 0 0);
     --popover-foreground: oklch(0 0 0);
-    --primary: oklch(56.962% 0.21125 292.117);
-    --primary-foreground: oklch(1 0 0);
+    --primary: #1890FF;
+    --primary-foreground: #FFFFFF;
     --secondary: oklch(0.954 0.0063 255.4755);
     --secondary-foreground: oklch(0.1344 0 0);
     --muted: oklch(0.9702 0 0);
@@ -145,8 +145,8 @@
     --card-foreground: oklch(0.9551 0 0);
     --popover: oklch(0.2568 0.0076 274.6528);
     --popover-foreground: oklch(0.9551 0 0);
-    --primary: oklch(0.6132 0.2294 291.7437);
-    --primary-foreground: oklch(1 0 0);
+    --primary: #1890FF;
+    --primary-foreground: #FFFFFF;
     --secondary: oklch(0.294 0.013 272.9312);
     --secondary-foreground: oklch(0.9551 0 0);
     --muted: oklch(0.294 0.013 272.9312);

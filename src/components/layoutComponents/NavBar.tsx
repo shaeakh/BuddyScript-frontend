@@ -1,103 +1,353 @@
-import SearchBar from '@/components/search/SearchBar'; // ← নতুন কম্পোনেন্ট ইমপোর্ট
+import SearchBar from '@/components/search/SearchBar';
 import { useSignOut } from '@/hooks/auth/useSignOut';
 import { getUserPayload } from '@/utils/localStorageUtils';
-import dp from '@public/assets/images/logo.png';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
-  HiOutlineCog,
-  HiOutlineHome,
-  HiOutlineSearch,
-  HiOutlineUserCircle,
-} from 'react-icons/hi';
-import { LuLoaderCircle, LuLogOut } from 'react-icons/lu';
+  LuBell,
+  LuChevronDown,
+  LuCircleHelp,
+  LuHouse,
+  LuLogOut,
+  LuMessageSquare,
+  LuSearch,
+  LuSettings,
+  LuUser,
+  LuUsers,
+  LuLoaderCircle,
+} from 'react-icons/lu';
 import { Link, NavLink } from 'react-router-dom';
 
 const NavBar = () => {
   const [username] = useState(() => {
-    const payload = getUserPayload();
-    return payload?.username || '';
+    try {
+      const payload = getUserPayload();
+      return payload?.username || 'Dylan Field';
+    } catch {
+      return 'Dylan Field';
+    }
   });
 
   const { handleSignOut, loading: isLoggingOut } = useSignOut();
 
-  const navLinkStyle =
-    'flex flex-col items-center justify-center p-2 rounded-md transition-all duration-200 text-muted-foreground hover:bg-accent hover:text-accent-foreground';
+  const [isNotifyOpen, setIsNotifyOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [notifyTab, setNotifyTab] = useState<'all' | 'unread'>('all');
+
+  const notifyRef = useRef<HTMLLIElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        notifyRef.current &&
+        !notifyRef.current.contains(event.target as Node)
+      ) {
+        setIsNotifyOpen(false);
+      }
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <>
-      {/* TOP NAV: Desktop & Tablet */}
-      <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-        <div className="w-full max-w-screen-2xl mx-auto flex h-16 items-center justify-between px-4 lg:px-8">
-          {/* Left Section: Logo & Primary Nav */}
-          <div className="flex items-center gap-6">
-            <Link
-              to="/home"
-              className="flex items-center space-x-2 transition-opacity hover:opacity-80"
-            >
-              <img src={dp} className="w-8 h-8 object-contain" alt="Logo" />
+      {/* ─── DESKTOP HEADER NAVBAR ─── */}
+      <header className="sticky top-0 z-50 w-full bg-card border-b border-border shadow-xs">
+        <div className="max-w-screen-2xl mx-auto px-4 lg:px-8 h-16 flex items-center justify-between gap-4">
+          {/* 1. Left Logo */}
+          <div className="flex items-center shrink-0">
+            <Link to="/home" className="flex items-center gap-2">
+              <img
+                src="/assets/images/logo.svg"
+                alt="BuddyScript Logo"
+                className="h-8 w-auto object-contain"
+              />
             </Link>
+          </div>
 
-            <div className="hidden md:flex items-center gap-2">
-              <NavLink title="Home" to="/home" className={navLinkStyle}>
-                <HiOutlineHome size={22} />
-              </NavLink>
+          {/* 2. Middle Search Bar (Centered) */}
+          <div className="flex-1 max-w-md mx-auto hidden md:block">
+            <SearchBar
+              placeholder="input search text"
+              className="w-full bg-muted/40 border border-border rounded-full py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
 
-              {/* ─── Reusable Search Bar ─── */}
-              <div className="ml-2">
-                <SearchBar
-                  placeholder="Search stories & users..."
-                  className="w-72" // ডেস্কটপে নির্দিষ্ট উইডথ
+          {/* 3. Right Navigation Icons & Profile */}
+          <div className="flex items-center gap-1 sm:gap-3 shrink-0">
+            <ul className="flex items-center gap-1 sm:gap-2">
+              {/* Home Link */}
+              <li>
+                <NavLink
+                  to="/home"
+                  className={({ isActive }) =>
+                    `relative p-2 rounded-lg text-foreground hover:bg-muted transition flex items-center justify-center ${
+                      isActive ? 'text-primary' : 'text-muted-foreground'
+                    }`
+                  }
+                  title="Home"
+                >
+                  <LuHouse className="w-5 h-5" />
+                </NavLink>
+              </li>
+
+              {/* Friend Requests Link */}
+              <li>
+                <NavLink
+                  to="/search"
+                  className={({ isActive }) =>
+                    `relative p-2 rounded-lg text-foreground hover:bg-muted transition flex items-center justify-center ${
+                      isActive ? 'text-primary' : 'text-muted-foreground'
+                    }`
+                  }
+                  title="Friends"
+                >
+                  <LuUsers className="w-5 h-5" />
+                </NavLink>
+              </li>
+
+              {/* Notification Bell Dropdown */}
+              <li className="relative" ref={notifyRef}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsNotifyOpen(!isNotifyOpen);
+                    setIsProfileOpen(false);
+                  }}
+                  className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition flex items-center justify-center"
+                  title="Notifications"
+                >
+                  <LuBell className="w-5 h-5" />
+                  <span className="absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-card">
+                    6
+                  </span>
+                </button>
+
+                {/* Notifications Dropdown Drawer */}
+                {isNotifyOpen && (
+                  <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-card border border-border rounded-xl shadow-2xl p-4 z-50 space-y-3 animate-in fade-in zoom-in duration-150">
+                    <div className="flex items-center justify-between border-b border-border pb-3">
+                      <h4 className="text-base font-bold text-foreground">
+                        Notifications
+                      </h4>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setNotifyTab('all')}
+                          className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+                            notifyTab === 'all'
+                              ? 'bg-primary text-primary-foreground'
+                              : 'text-muted-foreground hover:bg-muted'
+                          }`}
+                        >
+                          All
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setNotifyTab('unread')}
+                          className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+                            notifyTab === 'unread'
+                              ? 'bg-primary text-primary-foreground'
+                              : 'text-muted-foreground hover:bg-muted'
+                          }`}
+                        >
+                          Unread
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                      <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition cursor-pointer">
+                        <img
+                          src="/assets/images/friend-req.png"
+                          alt="Steve Jobs"
+                          className="w-10 h-10 rounded-full object-cover shrink-0 border border-border"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs text-foreground leading-snug">
+                            <span className="font-bold">Steve Jobs</span> posted a
+                            link in your timeline.
+                          </p>
+                          <span className="text-[10px] text-primary font-medium">
+                            42 minutes ago
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition cursor-pointer">
+                        <img
+                          src="/assets/images/profile-1.png"
+                          alt="Group Admin"
+                          className="w-10 h-10 rounded-full object-cover shrink-0 border border-border"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs text-foreground leading-snug">
+                            An admin changed the name of group{' '}
+                            <span className="font-bold">Freelancer USA</span>
+                          </p>
+                          <span className="text-[10px] text-primary font-medium">
+                            42 minutes ago
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </li>
+
+              {/* Chat Icon */}
+              <li>
+                <Link
+                  to="/chat"
+                  className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition flex items-center justify-center"
+                  title="Chat"
+                >
+                  <LuMessageSquare className="w-5 h-5" />
+                  <span className="absolute -top-0.5 -right-0.5 bg-primary text-primary-foreground text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-card">
+                    2
+                  </span>
+                </Link>
+              </li>
+            </ul>
+
+            <div className="h-6 w-px bg-border mx-1 hidden sm:block" />
+
+            {/* User Profile Menu */}
+            <div className="relative" ref={profileRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsProfileOpen(!isProfileOpen);
+                  setIsNotifyOpen(false);
+                }}
+                className="flex items-center gap-2 p-1 rounded-full hover:bg-muted transition"
+              >
+                <img
+                  src="/assets/images/profile.png"
+                  alt="Dylan Field"
+                  className="w-8 h-8 rounded-full object-cover border border-border"
                 />
-              </div>
+                <span className="text-xs font-semibold text-foreground hidden lg:inline-block">
+                  {username || 'Dylan Field'}
+                </span>
+                <LuChevronDown className="w-4 h-4 text-muted-foreground hidden sm:inline-block" />
+              </button>
+
+              {/* Profile Dropdown Drawer */}
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-card border border-border rounded-xl shadow-2xl p-2 z-50 space-y-1 animate-in fade-in zoom-in duration-150">
+                  <div className="flex items-center gap-3 p-2 border-b border-border mb-1">
+                    <img
+                      src="/assets/images/profile.png"
+                      alt={username}
+                      className="w-9 h-9 rounded-full object-cover border border-border"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <h5 className="text-xs font-bold text-foreground truncate">
+                        {username || 'Dylan Field'}
+                      </h5>
+                      <Link
+                        to={`/profile/${username}`}
+                        onClick={() => setIsProfileOpen(false)}
+                        className="text-[11px] font-medium text-primary hover:underline"
+                      >
+                        View Profile
+                      </Link>
+                    </div>
+                  </div>
+
+                  <Link
+                    to="/settings"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-foreground hover:bg-muted rounded-lg transition"
+                  >
+                    <LuSettings className="w-4 h-4 text-primary" />
+                    <span>Settings</span>
+                  </Link>
+
+                  <a
+                    href="#0"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-foreground hover:bg-muted rounded-lg transition"
+                  >
+                    <LuCircleHelp className="w-4 h-4 text-primary" />
+                    <span>Help & Support</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      handleSignOut();
+                    }}
+                    disabled={isLoggingOut}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 rounded-lg transition disabled:opacity-50"
+                  >
+                    {isLoggingOut ? (
+                      <LuLoaderCircle className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <LuLogOut className="w-4 h-4" />
+                    )}
+                    <span>Log Out</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
-
-          {/* Right Section: Desktop Profile & Actions */}
-          <div className="hidden md:flex items-center gap-2">
-            <NavLink
-              title="Profile"
-              to={`/profile/${username}`}
-              className={navLinkStyle}
-            >
-              <HiOutlineUserCircle size={22} />
-            </NavLink>
-
-            <NavLink title="Settings" to="/settings" className={navLinkStyle}>
-              <HiOutlineCog size={22} />
-            </NavLink>
-
-            <div className="mx-2 h-6 w-px bg-border" />
-
-            <button
-              onClick={handleSignOut}
-              disabled={isLoggingOut}
-              className="flex items-center justify-center p-2 text-destructive hover:bg-destructive/10 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Logout"
-            >
-              {isLoggingOut ? (
-                <LuLoaderCircle size={22} className="animate-spin" />
-              ) : (
-                <LuLogOut size={22} />
-              )}
-            </button>
-          </div>
         </div>
-      </nav>
+      </header>
 
-      {/* BOTTOM NAV: Mobile Only */}
-      <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t md:hidden">
-        <div className="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
-          <NavLink to="/home" className={navLinkStyle}>
-            <HiOutlineHome size={24} />
+      {/* ─── MOBILE BOTTOM NAVIGATION BAR ─── */}
+      <div className="fixed bottom-0 left-0 z-50 w-full h-14 bg-card border-t border-border md:hidden">
+        <div className="grid h-full grid-cols-4 items-center justify-items-center">
+          <NavLink
+            to="/home"
+            className={({ isActive }) =>
+              `p-2 text-muted-foreground hover:text-foreground ${
+                isActive ? 'text-primary font-bold' : ''
+              }`
+            }
+          >
+            <LuHouse className="w-6 h-6" />
           </NavLink>
-          <NavLink to="/search" className={navLinkStyle}>
-            <HiOutlineSearch size={24} />
+
+          <NavLink
+            to="/search"
+            className={({ isActive }) =>
+              `p-2 text-muted-foreground hover:text-foreground ${
+                isActive ? 'text-primary font-bold' : ''
+              }`
+            }
+          >
+            <LuSearch className="w-6 h-6" />
           </NavLink>
-          <NavLink to={`/profile/${username}`} className={navLinkStyle}>
-            <HiOutlineUserCircle size={24} />
+
+          <NavLink
+            to={`/profile/${username}`}
+            className={({ isActive }) =>
+              `p-2 text-muted-foreground hover:text-foreground ${
+                isActive ? 'text-primary font-bold' : ''
+              }`
+            }
+          >
+            <LuUser className="w-6 h-6" />
           </NavLink>
-          <NavLink to="/settings" className={navLinkStyle}>
-            <HiOutlineCog size={24} />
+
+          <NavLink
+            to="/settings"
+            className={({ isActive }) =>
+              `p-2 text-muted-foreground hover:text-foreground ${
+                isActive ? 'text-primary font-bold' : ''
+              }`
+            }
+          >
+            <LuSettings className="w-6 h-6" />
           </NavLink>
         </div>
       </div>

@@ -1,23 +1,25 @@
 import { useState } from 'react';
-import { LuChevronLeft, LuChevronRight, LuLoaderCircle } from 'react-icons/lu';
+import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import DeleteStoryDialog from '@/components/story/DeleteStoryDialog';
-import HeroSection from '@/components/story/HeroSection';
 import StoryCard from '@/components/story/StoryCard';
-import SummaryDialog from '@/components/story/SummaryDialog';
-import TrendingSidebar from '@/components/story/TrendingSidebar';
+import ExploreSidebar from '@/components/feed/ExploreSidebar';
+import StoriesCarousel from '@/components/feed/StoriesCarousel';
+import CreatePostBox from '@/components/feed/CreatePostBox';
+import RightSidebar from '@/components/feed/RightSidebar';
 
-import { useTrendingCategories } from '@/hooks/category/useTrendingCategories';
 import { useDeleteStory } from '@/hooks/story/useDeleteStory';
 import { useFetchStories } from '@/hooks/story/useFetchStories';
+import useToast from '@/hooks/component/useToast';
 
-const ITEMS_PER_PAGE = 4;
+const ITEMS_PER_PAGE = 6;
 
 const Home = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = Number(searchParams.get('page')) || 1;
+  const { showSuccess } = useToast();
 
   const {
     stories = [],
@@ -26,17 +28,12 @@ const Home = () => {
     refresh,
   } = useFetchStories(currentPage, ITEMS_PER_PAGE);
 
-  const { trendingCategories, loading: trendingLoading } =
-    useTrendingCategories();
-
-  const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
-  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
-
   const [storyToDelete, setStoryToDelete] = useState<number | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const { deleteStory, isDeleting } = useDeleteStory(() => {
     setIsDeleteOpen(false);
+    showSuccess('Story deleted successfully');
 
     if (stories.length === 1 && currentPage > 1) {
       setSearchParams({ page: String(currentPage - 1) });
@@ -66,53 +63,57 @@ const Home = () => {
   };
 
   return (
-    <div className="max-w-screen-2xl mx-auto px-4 lg:px-8 py-8 space-y-10">
-      <HeroSection onWriteStoryClick={() => navigate('/story/create')} />
+    <div className="max-w-screen-2xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* ─── LEFT SIDEBAR (EXPLORE, SUGGESTIONS, EVENTS) ─── */}
+        <aside className="hidden lg:block lg:col-span-3">
+          <div className="sticky top-20">
+            <ExploreSidebar />
+          </div>
+        </aside>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <main className="lg:col-span-8 space-y-6 flex flex-col justify-between">
-          <div className="space-y-6">
-            <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-              Latest Stories
-              {loading && (
-                <LuLoaderCircle className="w-4 h-4 animate-spin text-muted-foreground" />
-              )}
-            </h2>
+        {/* ─── MIDDLE FEED COLUMN (STORIES, PUBLISHER, FEED CARDS) ─── */}
+        <main className="lg:col-span-6 space-y-6">
+          {/* Stories Highlights Row */}
+          <StoriesCarousel />
 
+          {/* Create Post Publisher Box */}
+          <CreatePostBox onPostClick={() => navigate('/story/create')} />
+
+          {/* Main Feed Content List */}
+          <div className="space-y-4">
             {loading ? (
               <div className="space-y-4">
-                {[1, 2, 3, 4].map((n) => (
+                {[1, 2, 3].map((n) => (
                   <div
                     key={n}
-                    className="h-48 w-full bg-muted animate-pulse rounded-xl"
+                    className="h-56 w-full bg-card border border-border animate-pulse rounded-xl"
                   />
                 ))}
               </div>
             ) : stories?.length > 0 ? (
-              <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-4">
                 {stories.map((story) => (
                   <StoryCard
                     key={story.id}
                     story={story}
                     onEdit={handleEdit}
                     onDelete={handleDeleteClick}
-                    onSummaryClick={(s) => {
-                      setSelectedSummary(s);
-                      setIsSummaryOpen(true);
-                    }}
                   />
                 ))}
               </div>
             ) : (
-              <div className="text-center py-20 bg-muted/30 rounded-xl border border-dashed border-border">
-                <p className="text-muted-foreground">No stories found.</p>
+              <div className="text-center py-16 bg-card rounded-xl border border-dashed border-border p-6">
+                <p className="text-muted-foreground text-sm font-medium">
+                  No posts found in your feed yet.
+                </p>
               </div>
             )}
           </div>
 
-          {/* ─── COMPACT RESPONSIVE PAGINATION BAR ─── */}
+          {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-border pt-6 mt-4">
+            <div className="flex items-center justify-between border-t border-border pt-4 mt-6">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1 || loading}
@@ -122,7 +123,7 @@ const Home = () => {
                 <span>Previous</span>
               </button>
 
-              <div className="hidden sm:flex items-center gap-1.5">
+              <div className="hidden sm:flex items-center gap-1">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                   (page) => (
                     <button
@@ -141,7 +142,6 @@ const Home = () => {
                 )}
               </div>
 
-              {/* Mobile Text Indicator */}
               <span className="sm:hidden text-xs font-medium text-muted-foreground">
                 Page {currentPage} of {totalPages}
               </span>
@@ -158,18 +158,13 @@ const Home = () => {
           )}
         </main>
 
-        <TrendingSidebar
-          categories={trendingCategories}
-          loading={trendingLoading}
-        />
+        {/* ─── RIGHT SIDEBAR (RECOMMENDATIONS, FRIENDS) ─── */}
+        <aside className="hidden lg:block lg:col-span-3">
+          <div className="sticky top-20">
+            <RightSidebar />
+          </div>
+        </aside>
       </div>
-
-      {/* Summarize Dialog */}
-      <SummaryDialog
-        isOpen={isSummaryOpen}
-        onOpenChange={setIsSummaryOpen}
-        summary={selectedSummary}
-      />
 
       {/* Delete Confirmation Dialog */}
       <DeleteStoryDialog

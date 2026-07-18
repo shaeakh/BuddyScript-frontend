@@ -3,14 +3,20 @@ import type { Story } from '@/types/api/storyTypes';
 import EnvConstants from '@/utils/envConstants';
 import { getUserPayload, isAuthenticated } from '@/utils/localStorageUtils';
 import { useEffect, useRef, useState } from 'react';
-import { CiCircleMore } from 'react-icons/ci';
 import {
-  LuArrowBigDown,
-  LuArrowBigUp,
+  LuBookmark,
   LuClock,
+  LuEllipsisVertical,
+  LuGlobe,
+  LuHeart,
   LuMessageSquare,
   LuPencil,
+  LuBell,
+  LuEyeOff,
+  LuSend,
+  LuSmile,
   LuSparkles,
+  LuThumbsUp,
   LuTrash2,
   LuUser,
 } from 'react-icons/lu';
@@ -22,36 +28,29 @@ interface StoryCardProps {
   onEdit?: (id: number) => void;
   onDelete?: (id: number) => void;
   onSummaryClick?: (summary: string | null) => void;
-  // onVoteSuccess?: () => void;
 }
 
-const StoryCard = ({
+export const StoryCard = ({
   story,
   onEdit,
   onDelete,
   onSummaryClick,
-  // onVoteSuccess,
 }: StoryCardProps) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [newCommentText, setNewCommentText] = useState('');
   const menuRef = useRef<HTMLDivElement>(null);
   const { voteStory } = useVoteStory();
 
-  // ─── 1. LOCAL STATE FOR INSTANT UI UPDATES ──────────────────────────────────
-  // We keep a local mirror of the votes array to perform lightning-fast optimistic swaps
-  const [localVotes, setLocalVotes] = useState(story.votes || []);
+  const [localVotes, setLocalVotes] = useState(story?.votes || []);
 
-  // Sync state if the parent data changes (e.g., during pagination or heavy refetches)
-  // Sync state if the parent data changes (e.g., during pagination or heavy refetches)
   useEffect(() => {
-    // Wrapped in a 0ms setTimeout to push the state update to the next event tick
     const timer = setTimeout(() => {
-      setLocalVotes(story.votes || []);
+      setLocalVotes(story?.votes || []);
     }, 0);
-
-    // Clean up the timer if the component unmounts or story.votes changes quickly
     return () => clearTimeout(timer);
-  }, [story.votes]);
+  }, [story?.votes]);
 
   let canManage = false;
   let currentUserId: number | null = null;
@@ -59,9 +58,9 @@ const StoryCard = ({
   if (isAuthenticated()) {
     try {
       const currentUser = getUserPayload();
-      currentUserId = currentUser.id;
-      const isOwner = currentUser.id === story.userId;
-      const isAdmin = currentUser.role === 'ADMIN';
+      currentUserId = currentUser?.id ?? null;
+      const isOwner = currentUser?.id === story?.userId;
+      const isAdmin = currentUser?.role === 'ADMIN';
       canManage = isOwner || isAdmin;
     } catch (error) {
       console.error('User payload error:', error);
@@ -79,157 +78,188 @@ const StoryCard = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const formattedDate = new Date(story.created_at).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  const formattedDate = story?.created_at
+    ? new Date(story.created_at).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : 'Recent';
 
-  // ─── COMPUTED COUNTS FROM LOCAL STATE ──────────────────────────────────────
-  const upvotesCount = localVotes.filter((v) => v.type === 'UPVOTE').length;
-  const downvotesCount = localVotes.filter((v) => v.type === 'DOWNVOTE').length;
+  const upvotesCount = localVotes.filter((v) => v?.type === 'UPVOTE').length;
+  const downvotesCount = localVotes.filter((v) => v?.type === 'DOWNVOTE').length;
+  const totalReacts = upvotesCount + downvotesCount;
 
-  const userVote = localVotes.find((v) => v.userId === currentUserId);
+  const userVote = localVotes.find((v) => v?.userId === currentUserId);
   const isUpvoted = userVote?.type === 'UPVOTE';
-  const isDownvoted = userVote?.type === 'DOWNVOTE';
 
-  // ─── OPTIMISTIC HANDLER LOLOGIC ────────────────────────────────────────────
   const handleVoteAction = async (clickedType: 'UPVOTE' | 'DOWNVOTE') => {
     if (!isAuthenticated()) {
       navigate('/signin');
       return;
     }
+    if (!currentUserId || !story?.id) return;
 
-    if (!currentUserId) return;
-
-    // Preserve original copy for a clean rollback if the server fails
     const previousVotesBackup = [...localVotes];
-
-    // Build the structural transformation locally
     let newVotes = [...localVotes];
 
     if (userVote) {
       if (userVote.type === clickedType) {
-        // Condition A: User clicked their active vote -> Remove vote entirely (Unvote)
         newVotes = newVotes.filter((v) => v.userId !== currentUserId);
       } else {
-        // Condition B: User toggled between UPVOTE and DOWNVOTE -> Flip the property
         newVotes = newVotes.map((v) =>
           v.userId === currentUserId ? { ...v, type: clickedType } : v
         );
       }
     } else {
-      // Condition C: Brand new vote allocation -> Push a mock item to the array
       newVotes.push({
-        id: Date.now(), // temporary client-side runtime key
+        id: Date.now(),
         type: clickedType,
         userId: currentUserId,
         storyId: story.id,
       });
     }
 
-    // 🔥 INSTANT UPDATE: Renders immediately with zero latency
     setLocalVotes(newVotes);
-
-    // Dispatch background network call
     const result = await voteStory({ storyId: story.id, type: clickedType });
-
     if (!result) {
-      // 🔄 SERVER REJECTION / NETWORK FAILURE: Rollback to absolute reality
       setLocalVotes(previousVotesBackup);
     }
   };
 
-  return (
-    <div className="bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-all p-5 relative group">
-      {/* Top Controls Action Menu */}
-      <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
-        <button
-          onClick={() => onSummaryClick?.(story.summary)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-full text-xs font-semibold transition-colors"
-          title="View AI Summary"
-        >
-          <LuSparkles className="w-3.5 h-3.5" />
-          <span>Summary</span>
-        </button>
+  const username = story?.user?.username || 'user';
+  const authorName = story?.user?.name || 'Anonymous';
 
-        {canManage && (
-          <div className="relative" ref={menuRef}>
+  return (
+    <div className="bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-all p-4 sm:p-5 relative space-y-4">
+      {/* ─── POST HEADER ─── */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3 min-w-0">
+          <Link
+            to={`/profile/${username}`}
+            className="w-10 h-10 rounded-full bg-muted flex items-center justify-center border border-border overflow-hidden shrink-0 hover:border-primary/50 transition-colors"
+          >
+            <img
+              src="/assets/images/post_img.png"
+              alt={authorName}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = 'none';
+              }}
+            />
+            <LuUser className="w-5 h-5 text-muted-foreground" />
+          </Link>
+
+          <div className="min-w-0">
+            <Link
+              to={`/profile/${username}`}
+              className="text-sm font-bold text-foreground hover:text-primary transition-colors truncate block"
+            >
+              {authorName}
+            </Link>
+            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mt-0.5">
+              <LuClock className="w-3 h-3" />
+              <span>{formattedDate}</span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <LuGlobe className="w-3 h-3" />
+                Public
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── DROPDOWN & SUMMARY ─── */}
+        <div className="flex items-center gap-1.5" ref={menuRef}>
+          {story?.summary && (
+            <button
+              onClick={() => onSummaryClick?.(story.summary)}
+              className="flex items-center gap-1 px-2.5 py-1 bg-primary/10 text-primary hover:bg-primary/20 rounded-full text-xs font-semibold transition"
+              title="View AI Summary"
+            >
+              <LuSparkles className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Summary</span>
+            </button>
+          )}
+
+          <div className="relative">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-full transition-colors"
+              className="p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition"
             >
-              <CiCircleMore className="w-5 h-5" />
+              <LuEllipsisVertical className="w-5 h-5" />
             </button>
 
             {isMenuOpen && (
-              <div className="absolute right-0 mt-2 w-36 bg-card border border-border rounded-lg shadow-xl py-1 z-30 animate-in fade-in zoom-in duration-200">
+              <div className="absolute right-0 mt-1 w-44 bg-card border border-border rounded-xl shadow-xl py-1 z-30 animate-in fade-in zoom-in duration-150">
                 <button
-                  onClick={() => {
-                    onEdit?.(story.id);
-                    setIsMenuOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-accent transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-foreground hover:bg-muted transition"
                 >
-                  <LuPencil className="w-4 h-4" /> Edit
+                  <LuBookmark className="w-4 h-4 text-primary" /> Save Post
                 </button>
                 <button
-                  onClick={() => {
-                    onDelete?.(story.id);
-                    setIsMenuOpen(false);
-                  }}
-                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-foreground hover:bg-muted transition"
                 >
-                  <LuTrash2 className="w-4 h-4" /> Delete
+                  <LuBell className="w-4 h-4 text-primary" /> Turn On Notification
                 </button>
+                <button
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-foreground hover:bg-muted transition"
+                >
+                  <LuEyeOff className="w-4 h-4 text-primary" /> Hide
+                </button>
+
+                {canManage && (
+                  <>
+                    <div className="my-1 border-t border-border" />
+                    <button
+                      onClick={() => {
+                        if (story?.id) onEdit?.(story.id);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-foreground hover:bg-muted transition"
+                    >
+                      <LuPencil className="w-4 h-4 text-emerald-500" /> Edit Post
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (story?.id) onDelete?.(story.id);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 transition"
+                    >
+                      <LuTrash2 className="w-4 h-4" /> Delete Post
+                    </button>
+                  </>
+                )}
               </div>
             )}
-          </div>
-        )}
-      </div>
-
-      {/* Author Details Meta */}
-      <div className="flex items-center gap-3 mb-4">
-        <Link
-          to={`/profile/${story.user.username}`}
-          className="w-10 h-10 rounded-full bg-muted flex items-center justify-center border border-border overflow-hidden hover:border-primary/50 transition-colors"
-        >
-          <LuUser className="w-6 h-6 text-muted-foreground" />
-        </Link>
-        <div className="flex flex-col">
-          <Link
-            to={`/profile/${story.user.username}`}
-            className="text-sm font-bold text-foreground leading-none hover:text-primary transition-colors w-fit"
-          >
-            {story.user.name}
-          </Link>
-          <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-1">
-            <LuClock className="w-3 h-3" />
-            <span>{formattedDate}</span>
           </div>
         </div>
       </div>
 
-      {/* Main Content Body */}
+      {/* ─── POST CONTENT BODY ─── */}
       <div className="space-y-2">
         <Link
-          to={`/story/${story.id}`}
-          className="block text-xl font-bold text-foreground line-clamp-2 leading-tight hover:text-primary transition-colors cursor-pointer"
+          to={`/story/${story?.id}`}
+          className="block text-base sm:text-lg font-bold text-foreground hover:text-primary transition line-clamp-2 leading-snug"
         >
-          {story.title}
+          {story?.title}
         </Link>
-        <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-          {story.body}
+        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">
+          {story?.body}
         </p>
       </div>
 
-      {/* Categories / Tags Section */}
-      {story.categories && story.categories.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-5">
+      {/* ─── CATEGORIES & TAGS ─── */}
+      {story?.categories && story.categories.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
           {story.categories.map((cat) => (
             <span
               key={cat.id}
-              className="text-[10px] uppercase tracking-wider font-bold bg-muted text-muted-foreground px-2 py-0.5 rounded border border-border"
+              className="text-[10px] uppercase font-bold bg-muted/60 text-muted-foreground px-2 py-0.5 rounded-md border border-border"
             >
               #{cat.name}
             </span>
@@ -237,61 +267,143 @@ const StoryCard = ({
         </div>
       )}
 
-      {/* ─── Horizontal Divider ─── */}
-      <div className="my-4 border-t border-border" />
-
-      {/* ─── Actions Row ─── */}
-      <div className="flex items-center justify-between text-muted-foreground">
-        <div className="flex items-center bg-muted/30 border border-border rounded-lg p-1 gap-1">
-          {/* Upvote Button */}
-          <button
-            onClick={() => handleVoteAction('UPVOTE')}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-              isUpvoted
-                ? 'bg-primary/20 text-primary'
-                : 'hover:bg-accent hover:text-accent-foreground'
-            }`}
-            title="Upvote"
-          >
-            <LuArrowBigUp
-              className={`w-4 h-4 ${isUpvoted ? 'fill-primary' : ''}`}
-            />
-            <span>{upvotesCount}</span>
-          </button>
-
-          {/* Downvote Button */}
-          <button
-            onClick={() => handleVoteAction('DOWNVOTE')}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-              isDownvoted
-                ? 'bg-destructive/20 text-destructive'
-                : 'hover:bg-accent hover:text-accent-foreground'
-            }`}
-            title="Downvote"
-          >
-            <LuArrowBigDown
-              className={`w-4 h-4 ${isDownvoted ? 'fill-destructive' : ''}`}
-            />
-            <span>{downvotesCount}</span>
-          </button>
-
-          <div className="w-px h-4 bg-border mx-1" />
-
-          {/* Comment Navigation Button */}
-          <button
-            onClick={() => navigate(`/story/${story.id}`)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 hover:bg-accent hover:text-accent-foreground rounded-md text-xs font-semibold transition-colors"
-            title="View Comments"
-          >
-            <LuMessageSquare className="w-4 h-4" />
-            <span>{story.comments?.length || 0}</span>
-          </button>
+      {/* ─── TOTAL REACTIONS STATS BAR ─── */}
+      <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border">
+        <div className="flex items-center gap-1.5">
+          <div className="flex -space-x-1">
+            <span className="w-5 h-5 rounded-full bg-amber-400 text-black flex items-center justify-center text-[10px] border border-card">
+              😆
+            </span>
+            <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] border border-card">
+              <LuThumbsUp className="w-3 h-3 fill-current" />
+            </span>
+          </div>
+          <span className="font-semibold text-foreground">
+            {totalReacts > 0 ? `${totalReacts}+` : '0'}
+          </span>
         </div>
 
-        <ShareButton
-          shareUrl={`${EnvConstants.FRONTEND_URL}/story/${story.id}`}
-        />
+        <div className="flex items-center gap-3 text-xs">
+          <button
+            type="button"
+            onClick={() => setShowComments(!showComments)}
+            className="hover:underline hover:text-foreground"
+          >
+            {story?.comments?.length || 0} Comment
+          </button>
+          <span>122 Share</span>
+        </div>
       </div>
+
+      {/* ─── INTERACTIVE ACTIONS BAR ─── */}
+      <div className="grid grid-cols-3 gap-1 pt-1 border-t border-border">
+        <button
+          onClick={() => handleVoteAction('UPVOTE')}
+          className={`flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition ${
+            isUpvoted
+              ? 'bg-primary/10 text-primary'
+              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+          }`}
+        >
+          <LuSmile className="w-4 h-4" />
+          <span>{isUpvoted ? 'Haha' : 'React'}</span>
+        </button>
+
+        <button
+          onClick={() => setShowComments(!showComments)}
+          className="flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition"
+        >
+          <LuMessageSquare className="w-4 h-4" />
+          <span>Comment</span>
+        </button>
+
+        <div className="flex items-center justify-center">
+          <ShareButton
+            shareUrl={`${EnvConstants.FRONTEND_URL}/story/${story?.id}`}
+          />
+        </div>
+      </div>
+
+      {/* ─── COLLAPSIBLE COMMENTS SECTION ─── */}
+      {showComments && (
+        <div className="pt-3 border-t border-border space-y-3 animate-in fade-in duration-200">
+          {/* Add Comment Input */}
+          <div className="flex items-center gap-2">
+            <img
+              src="/assets/images/comment_img.png"
+              alt="Commenter"
+              className="w-8 h-8 rounded-full object-cover shrink-0"
+            />
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                value={newCommentText}
+                onChange={(e) => setNewCommentText(e.target.value)}
+                placeholder="Write a comment..."
+                className="w-full bg-muted/40 border border-border rounded-full pl-3 pr-9 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  if (newCommentText.trim() && story?.id) {
+                    navigate(`/story/${story.id}`);
+                  }
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-primary/80"
+              >
+                <LuSend className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Comment Tree Preview */}
+          {story?.comments && story.comments.length > 0 && (
+            <div className="space-y-2 pt-1">
+              <button
+                onClick={() => navigate(`/story/${story.id}`)}
+                className="text-xs text-primary font-medium hover:underline"
+              >
+                View all {story.comments.length} comments
+              </button>
+
+              {story.comments.slice(0, 2).map((comment) => (
+                <div
+                  key={comment.id}
+                  className="flex items-start gap-2.5 bg-muted/30 p-2.5 rounded-xl border border-border/50 text-xs"
+                >
+                  <img
+                    src="/assets/images/txt_img.png"
+                    alt={comment.user?.name || 'User'}
+                    className="w-7 h-7 rounded-full object-cover shrink-0 border border-border"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-foreground truncate">
+                        {comment.user?.name || 'Anonymous User'}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground">
+                        21m
+                      </span>
+                    </div>
+                    <p className="text-muted-foreground mt-0.5">
+                      {comment.body}
+                    </p>
+                    <div className="flex items-center gap-3 mt-1.5 text-[10px] text-muted-foreground font-medium">
+                      <button className="hover:text-primary">Like</button>
+                      <button className="hover:text-primary">Reply</button>
+                      <span className="flex items-center gap-1 text-primary">
+                        <LuThumbsUp className="w-3 h-3" />
+                        <LuHeart className="w-3 h-3 text-rose-500 fill-rose-500" />
+                        198
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -7,15 +7,16 @@ export const setUserPayload = (userPayload: UserPayload | undefined) => {
   localStorage.setItem('userPayload', JSON.stringify(userPayload));
 };
 
-export const getUserPayload = (): UserPayload => {
-  const userPayload = localStorage.getItem('userPayload');
-
-  if (!userPayload) {
-    throw new Error('User not found. Please sign in again');
+export const getUserPayload = (): UserPayload | null => {
+  try {
+    const userPayload = localStorage.getItem('userPayload');
+    if (!userPayload || userPayload === 'undefined' || userPayload === 'null') {
+      return null;
+    }
+    return JSON.parse(userPayload) as UserPayload;
+  } catch {
+    return null;
   }
-  const parsedUserPayload = JSON.parse(userPayload) as UserPayload;
-
-  return parsedUserPayload;
 };
 
 export const removeUserPayload = () => {
@@ -25,8 +26,12 @@ export const removeUserPayload = () => {
 export const isAuthenticated = (): boolean => {
   try {
     const userPayload = localStorage.getItem('userPayload');
-
-    return userPayload !== null;
+    return (
+      userPayload !== null &&
+      userPayload !== 'undefined' &&
+      userPayload !== 'null' &&
+      userPayload !== ''
+    );
   } catch {
     return false;
   }

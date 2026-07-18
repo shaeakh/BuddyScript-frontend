@@ -1,14 +1,14 @@
 import { ProtectedLayout, PublicLayout } from '@/components/Layout';
-import EditStory from '@/pages/Story/EditStory';
 import Auth from '@/pages/Auth';
-import Login from '@/pages/Login';
-import Registration from '@/pages/Registration';
 import Home from '@/pages/Home';
 import Landing from '@/pages/Landing';
+import Login from '@/pages/Login';
 import Profile from '@/pages/Profile';
+import Registration from '@/pages/Registration';
 import Search from '@/pages/Search';
 import Settings from '@/pages/Settings';
 import CreateStory from '@/pages/Story/CreateStory';
+import EditStory from '@/pages/Story/EditStory';
 import StoryDetails from '@/pages/Story/StoryDetails';
 import { createBrowserRouter } from 'react-router-dom';
 

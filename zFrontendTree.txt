@@ -1,0 +1,328 @@
+Folder PATH listing for volume New Volume
+Volume serial number is 00000053 3ADF:CD5A
+D:.
+�   .env
+�   .env.example
+�   .gitignore
+�   .prettierignore
+�   .prettierrc
+�   components.json
+�   eslint.config.js
+�   frontendFilesList.txt
+�   index.html
+�   package-lock.json
+�   package.json
+�   README.md
+�   tsconfig.app.json
+�   tsconfig.json
+�   tsconfig.node.json
+�   vercel.json
+�   vite.config.ts
+�   zcmds.txt
+�   zFrontendTree.txt
+�   
++---.husky
+�   �   pre-commit
+�   �   
+�   +---_
+�           .gitignore
+�           husky.sh
+�           
++---node_modules
+�               
++---public
+�   �   _redirects
+�   �   
+�   +---assets
+�       +---fonts
+�       �   �   fa-brands-400.eot
+�       �   �   fa-brands-400.svg
+�       �   �   fa-brands-400.ttf
+�       �   �   fa-brands-400.woff
+�       �   �   fa-brands-400.woff2
+�       �   �   fa-regular-400.eot
+�       �   �   fa-regular-400.svg
+�       �   �   fa-regular-400.ttf
+�       �   �   fa-regular-400.woff
+�       �   �   fa-regular-400.woff2
+�       �   �   fa-solid-900.eot
+�       �   �   fa-solid-900.svg
+�       �   �   fa-solid-900.ttf
+�       �   �   fa-solid-900.woff
+�       �   �   fa-solid-900.woff2
+�       �   �   
+�       �   +---flaticon
+�       �       �   backup.txt
+�       �       �   flaticon.css
+�       �       �   Flaticon.eot
+�       �       �   Flaticon.svg
+�       �       �   Flaticon.ttf
+�       �       �   Flaticon.woff
+�       �       �   Flaticon.woff2
+�       �       �   
+�       �       +---license
+�       �               license.pdf
+�       �               
+�       +---images
+�               Avatar.png
+�               card_ppl1.png
+�               card_ppl2.png
+�               card_ppl3.png
+�               card_ppl4.png
+�               Caretdown.svg
+�               chat1_img.png
+�               chat2_img.png
+�               chat3_img.png
+�               chat4_img.png
+�               chat5_img.png
+�               chat6_img.png
+�               chat7_img.png
+�               chat_img.png
+�               chat_profile.png
+�               chat_profile1.png
+�               comment_img.png
+�               dark_shape.svg
+�               dark_shape1.svg
+�               dark_shape2.svg
+�               f1.png
+�               f2.png
+�               f3.png
+�               f4.png
+�               f5.png
+�               f6.png
+�               f7.png
+�               f8.png
+�               f9.png
+�               feed_event1.png
+�               friend-req.png
+�               friends_img.png
+�               google.svg
+�               group-profile.png
+�               group-single.png
+�               grp_ct1.png
+�               grp_ct2.png
+�               grp_ct3.png
+�               grp_ct4.png
+�               grp_ct5.png
+�               grp_ct6.png
+�               img1.png
+�               img10.png
+�               img11.png
+�               img12.png
+�               img2.png
+�               img3.png
+�               img4.png
+�               img5.png
+�               img6.png
+�               img7.png
+�               img8.png
+�               img9.png
+�               line.svg
+�               login.png
+�               logo-copy.svg
+�               logo.png
+�               logo.svg
+�               man.png
+�               mini_pic.png
+�               mobile_story_img.png
+�               mobile_story_img1.png
+�               mobile_story_img2.png
+�               Path.svg
+�               people1.png
+�               people2.png
+�               people3.png
+�               photos1.png
+�               photos2.png
+�               photos3.png
+�               photos4.png
+�               photos5.png
+�               photos6.png
+�               photos7.png
+�               photos8.png
+�               photos9.png
+�               post_img.png
+�               profile-1.png
+�               profile-cover-img.png
+�               profile.png
+�               react_img1.png
+�               react_img2.png
+�               react_img3.png
+�               react_img4.png
+�               react_img5.png
+�               react_img6.png
+�               recommend1.png
+�               recommend2.png
+�               recommend3.png
+�               recommend4.png
+�               recommend_mini.png
+�               registration.png
+�               registration1.png
+�               shape1.png
+�               shape1.svg
+�               shape2.svg
+�               shape3.svg
+�               slider1.png
+�               slider2.png
+�               slider3.png
+�               slider4.png
+�               timeline_img.png
+�               top_img.png
+�               txt_img.png
+�               
++---src
+    �   App.tsx
+    �   index.css
+    �   main.tsx
+    �   
+    +---apis
+    �   �   axios.ts
+    �   �   
+    �   +---auth
+    �   �       authApi.ts
+    �   �       
+    �   +---category
+    �   �       categoryApi.ts
+    �   �       
+    �   +---comment
+    �   �       commentApi.ts
+    �   �       
+    �   +---profile
+    �   �       profileApi.ts
+    �   �       
+    �   +---search
+    �   �       searchApi.ts
+    �   �       
+    �   +---story
+    �   �       storyApi.ts
+    �   �       
+    �   +---user
+    �   �       userApi.ts
+    �   �       
+    �   +---vote
+    �           voteApi.ts
+    �           
+    +---components
+    �   �   Layout.tsx
+    �   �   
+    �   +---auth
+    �   �       signInCard.tsx
+    �   �       signUpCard.tsx
+    �   �       
+    �   +---landing
+    �   �       CodePreviewBlock.tsx
+    �   �       Features.tsx
+    �   �       Footer.tsx
+    �   �       HeroSection.tsx
+    �   �       LandingNavBar.tsx
+    �   �       Toast.tsx
+    �   �       
+    �   +---layoutComponents
+    �   �       NavBar.tsx
+    �   �       Toast.tsx
+    �   �       
+    �   +---search
+    �   �       SearchBar.tsx
+    �   �       
+    �   +---settings
+    �   �       GeneralSection.tsx
+    �   �       SecuritySection.tsx
+    �   �       
+    �   +---story
+    �   �       DeleteStoryDialog.tsx
+    �   �       HeroSection.tsx
+    �   �       shareButton.tsx
+    �   �       StoryCard.tsx
+    �   �       StoryForm.tsx
+    �   �       SummaryDialog.tsx
+    �   �       TrendingSidebar.tsx
+    �   �       
+    �   +---ui
+    �           alert-dialog.tsx
+    �           badge.tsx
+    �           button.tsx
+    �           dialog.tsx
+    �           
+    +---contexts
+    �       ToastContext.tsx
+    �       
+    +---hooks
+    �   +---auth
+    �   �       useChangePassword.ts
+    �   �       useSignIn.ts
+    �   �       useSignOut.ts
+    �   �       useSignUp.ts
+    �   �       useVerifyOtp.ts
+    �   �       
+    �   +---category
+    �   �       useFetchCategories.ts
+    �   �       useTrendingCategories.ts
+    �   �       
+    �   +---comment
+    �   �       useCreateComment.ts
+    �   �       
+    �   +---component
+    �   �       useSettings.ts
+    �   �       useToast.ts
+    �   �       
+    �   +---profile
+    �   �       useFetchProfile.ts
+    �   �       
+    �   +---search
+    �   �       useSearch.ts
+    �   �       
+    �   +---story
+    �   �       useCreateStory.ts
+    �   �       useDeleteStory.ts
+    �   �       useFetchStories.ts
+    �   �       useFetchStoryById.ts
+    �   �       useUpdateStory.ts
+    �   �       
+    �   +---user
+    �   �       useUpdateUser.ts
+    �   �       
+    �   +---vote
+    �           useVoteComment.ts
+    �           useVoteStory.ts
+    �           
+    +---lib
+    �       utils.ts
+    �       
+    +---pages
+    �   �   Auth.tsx
+    �   �   Home.tsx
+    �   �   Landing.tsx
+    �   �   Login.tsx
+    �   �   Profile.tsx
+    �   �   Registration.tsx
+    �   �   Search.tsx
+    �   �   Settings.tsx
+    �   �   
+    �   +---Story
+    �           CreateStory.tsx
+    �           EditStory.tsx
+    �           StoryDetails.tsx
+    �           
+    +---providers
+    �       ToastProvider.tsx
+    �       
+    +---types
+    �   +---api
+    �   �       authTypes.ts
+    �   �       categoryTypes.ts
+    �   �       commentTypes.ts
+    �   �       CommonTypes.ts
+    �   �       profileTypes.ts
+    �   �       searchTypes.ts
+    �   �       storyTypes.ts
+    �   �       userTypes.ts
+    �   �       voteTypes.ts
+    �   �       
+    �   +---components
+    �           toastTypes.ts
+    �           
+    +---utils
+            endPoints.ts
+            envConstants.ts
+            localStorageUtils.ts
+            route.tsx
+            

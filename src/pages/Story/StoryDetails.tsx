@@ -38,7 +38,7 @@ const StoryDetails = () => {
   if (isAuthenticated()) {
     try {
       const currentUser = getUserPayload();
-      currentUserId = currentUser.id;
+      currentUserId = currentUser?.id ?? null;
     } catch (error) {
       console.error('User payload reading error:', error);
     }

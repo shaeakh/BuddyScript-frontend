@@ -1,4 +1,3 @@
-import logo from '@public/assets/images/logo.png';
 import { FaFacebook, FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
 const Footer = () => {
@@ -44,9 +43,9 @@ const Footer = () => {
         <div className="col-span-1 sm:col-span-2 md:col-span-1">
           <div className="flex items-center gap-2 mb-4">
             <div className="bg-white rounded-lg p-1.5 flex items-center justify-center">
-              <img src={logo} alt="Logo" className="h-6 w-6" />
+              <img src="/assets/images/logo-copy.svg" alt="BuddyScript Logo" className="h-6 w-6" />
             </div>
-            <h3 className="text-lg md:text-xl font-bold">Debugging Diaries</h3>
+            <h3 className="text-lg md:text-xl font-bold">BuddyScript</h3>
           </div>
           <p className="text-sm md:text-base text-primary-foreground/80 mb-4 leading-relaxed">
             Share your debugging stories, learn from others' experiences, and
@@ -102,7 +101,7 @@ const Footer = () => {
       <hr className="border-white/20 mb-5 md:mb-5" />
 
       <p className="text-sm md:text-base text-primary-foreground/70">
-        &copy; {currentYear} Debugging Diaries. All rights reserved.
+        &copy; {currentYear} BuddyScript. All rights reserved.
       </p>
     </footer>
   );

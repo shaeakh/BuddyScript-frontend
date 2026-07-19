@@ -26,12 +26,23 @@ const userApi = {
     return response.data?.data || response.data;
   },
   update: async (id: number, data: UserUpdate): Promise<BaseUser> => {
-    // Note: Backend userRoute.ts uses .patch() for updates
-    const response = await api.patch<SingleUserResponse>(
-      ENDPOINTS.users.update(id),
-      data
-    );
-    return response.data?.data || response.data;
+    try {
+      const response = await api.put<SingleUserResponse>(
+        ENDPOINTS.users.update(id),
+        data
+      );
+      return response.data?.data || response.data;
+    } catch (err: unknown) {
+      const error = err as { response?: { status?: number } };
+      if (error?.response?.status === 405) {
+        const response = await api.patch<SingleUserResponse>(
+          ENDPOINTS.users.update(id),
+          data
+        );
+        return response.data?.data || response.data;
+      }
+      throw err;
+    }
   },
 
   delete: async (id: number): Promise<BaseSuccessResponse> => {

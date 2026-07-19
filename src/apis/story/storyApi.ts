@@ -33,8 +33,17 @@ const storyApi = {
   },
 
   update: async (id: number, data: StoryUpdate): Promise<Story> => {
-    const response = await api.patch<Story>(ENDPOINTS.stories.update(id), data);
-    return response.data;
+    try {
+      const response = await api.put<Story>(ENDPOINTS.stories.update(id), data);
+      return response.data;
+    } catch (err: unknown) {
+      const error = err as { response?: { status?: number } };
+      if (error?.response?.status === 405) {
+        const response = await api.patch<Story>(ENDPOINTS.stories.update(id), data);
+        return response.data;
+      }
+      throw err;
+    }
   },
 
   delete: async (id: number): Promise<BaseSuccessResponse> => {

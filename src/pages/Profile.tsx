@@ -1,7 +1,9 @@
 import StoryCard from '@/components/story/StoryCard';
 import SummaryDialog from '@/components/story/SummaryDialog';
+import DeleteStoryDialog from '@/components/story/DeleteStoryDialog';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { useFetchProfile } from '@/hooks/profile/useFetchProfile';
+import { useDeleteStory } from '@/hooks/story/useDeleteStory';
 import { getUserPayload } from '@/utils/localStorageUtils';
 import { useState } from 'react';
 import { LuCalendar, LuMail, LuShieldCheck, LuUser } from 'react-icons/lu';
@@ -11,16 +13,34 @@ const Profile = () => {
   const { username } = useParams<{ username: string }>();
   const navigate = useNavigate();
 
-  const { profile, loading } = useFetchProfile(username);
+  const { profile, loading, refetch } = useFetchProfile(username);
 
   // ─── Dialog Management States ───
   const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const [storyToDelete, setStoryToDelete] = useState<number | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const { deleteStory, isDeleting } = useDeleteStory(() => {
+    setIsDeleteOpen(false);
+    refetch();
+  });
 
   const currentUser = getUserPayload();
   const isOwnProfile = currentUser?.username === username;
 
   const handleEdit = (id: number) => navigate(`/story/edit/${id}`);
+
+  const handleDeleteClick = (id: number) => {
+    setStoryToDelete(id);
+    setIsDeleteOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (storyToDelete) {
+      deleteStory(storyToDelete);
+    }
+  };
 
   if (loading) {
     return (
@@ -133,6 +153,7 @@ const Profile = () => {
                 key={story.id}
                 story={story}
                 onEdit={handleEdit}
+                onDelete={handleDeleteClick}
                 onSummaryClick={(s) => {
                   setSelectedSummary(s);
                   setIsSummaryOpen(true);
@@ -152,6 +173,14 @@ const Profile = () => {
         isOpen={isSummaryOpen}
         onOpenChange={setIsSummaryOpen}
         summary={selectedSummary}
+      />
+
+      {/* ─── Delete Story Confirmation Dialog ─── */}
+      <DeleteStoryDialog
+        isOpen={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        onConfirm={confirmDelete}
+        isDeleting={isDeleting}
       />
     </div>
   );

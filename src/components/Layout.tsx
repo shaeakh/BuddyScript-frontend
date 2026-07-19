@@ -1,5 +1,4 @@
 import NavBar from '@/components/layoutComponents/NavBar';
-import ThemeToggle from '@/components/layoutComponents/ThemeToggle';
 
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { ToastProvider } from '@/providers/ToastProvider';
@@ -16,7 +15,6 @@ const AppShell = ({ auth }: { auth: boolean }) => (
             <Outlet />
           </main>
         </div>
-        <ThemeToggle />
       </div>
     </ToastProvider>
   </ThemeProvider>

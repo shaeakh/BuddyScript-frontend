@@ -4,6 +4,7 @@ import { LuLoaderCircle, LuTrash2 } from 'react-icons/lu';
 import { GeneralSection } from '@/components/settings/GeneralSection';
 import { SecuritySection } from '@/components/settings/SecuritySection';
 import { useSettings } from '@/hooks/component/useSettings';
+import ThemeToggle from '@/components/layoutComponents/ThemeToggle';
 
 const SettingsPage = () => {
   const {
@@ -224,6 +225,9 @@ const SettingsPage = () => {
           </div>
         </DialogWrapper>
       )}
+
+      {/* Theme Toggle Button */}
+      <ThemeToggle />
     </div>
   );
 };

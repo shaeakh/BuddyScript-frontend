@@ -1,4 +1,5 @@
 import { useVoteStory } from '@/hooks/vote/useVoteStory';
+import { useDeleteStory } from '@/hooks/story/useDeleteStory';
 import type { Story } from '@/types/api/storyTypes';
 import EnvConstants from '@/utils/envConstants';
 import { getUserPayload, isAuthenticated } from '@/utils/localStorageUtils';
@@ -21,6 +22,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import ShareButton from './shareButton';
 import SummaryDialog from './SummaryDialog';
+import DeleteStoryDialog from './DeleteStoryDialog';
 
 interface StoryCardProps {
   story: Story;
@@ -38,10 +40,16 @@ export const StoryCard = ({
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [newCommentText, setNewCommentText] = useState('');
   const menuRef = useRef<HTMLDivElement>(null);
   const { voteStory } = useVoteStory();
+
+  const { deleteStory, isDeleting } = useDeleteStory(() => {
+    setIsDeleteOpen(false);
+    window.location.reload();
+  });
 
   const [localVotes, setLocalVotes] = useState(story?.votes || []);
 
@@ -61,9 +69,19 @@ export const StoryCard = ({
       const currentUser = getUserPayload();
       currentUserId = currentUser?.id ?? null;
       currentUserUsername = currentUser?.username || currentUser?.name || null;
-      const isOwner = currentUser?.id === story?.userId;
-      const isAdmin = currentUser?.role === 'ADMIN';
-      canManage = isOwner || isAdmin;
+
+      const storyAuthorId =
+        story?.userId ?? story?.user?.id ?? (story as any)?.user_id;
+
+      const isOwner =
+        currentUserId !== null &&
+        storyAuthorId !== undefined &&
+        storyAuthorId !== null &&
+        Number(currentUserId) === Number(storyAuthorId);
+
+      const isAdmin = currentUser?.role?.toUpperCase() === 'ADMIN';
+
+      canManage = Boolean(isOwner || isAdmin);
     } catch (error) {
       console.error('User payload error:', error);
       canManage = false;
@@ -226,8 +244,14 @@ export const StoryCard = ({
                     <div className="my-1 border-t border-border" />
                     <button
                       onClick={() => {
-                        if (story?.id) onEdit?.(story.id);
                         setIsMenuOpen(false);
+                        if (story?.id) {
+                          if (onEdit) {
+                            onEdit(story.id);
+                          } else {
+                            navigate(`/story/edit/${story.id}`);
+                          }
+                        }
                       }}
                       className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-foreground hover:bg-muted transition"
                     >
@@ -235,8 +259,14 @@ export const StoryCard = ({
                     </button>
                     <button
                       onClick={() => {
-                        if (story?.id) onDelete?.(story.id);
                         setIsMenuOpen(false);
+                        if (story?.id) {
+                          if (onDelete) {
+                            onDelete(story.id);
+                          } else {
+                            setIsDeleteOpen(true);
+                          }
+                        }
                       }}
                       className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-destructive hover:bg-destructive/10 transition"
                     >
@@ -480,6 +510,16 @@ export const StoryCard = ({
         isOpen={isSummaryOpen}
         onOpenChange={setIsSummaryOpen}
         summary={story?.summary || null}
+      />
+
+      {/* ─── DELETE STORY DIALOG ─── */}
+      <DeleteStoryDialog
+        isOpen={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        onConfirm={() => {
+          if (story?.id) deleteStory(story.id);
+        }}
+        isDeleting={isDeleting}
       />
     </div>
   );

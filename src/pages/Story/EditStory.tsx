@@ -5,6 +5,7 @@ import { useFetchCategories } from '@/hooks/category/useFetchCategories';
 import useToast from '@/hooks/component/useToast';
 import { useUpdateStory } from '@/hooks/story/useUpdateStory';
 import type { StoryUpdate } from '@/types/api/storyTypes';
+import { getUserPayload, isAuthenticated } from '@/utils/localStorageUtils';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -26,7 +27,7 @@ const EditStory = () => {
 
   const { updateStory, loading: submitLoading } = useUpdateStory();
 
-  // ── Story fetch by id ───────────────────────────────────────────────────────
+  // ── Story fetch by id & permission check ─────────────────────────────────────
   useEffect(() => {
     if (!id) {
       navigate('/home');
@@ -36,6 +37,32 @@ const EditStory = () => {
     const fetchStory = async () => {
       try {
         const story = await storyApi.getById(Number(id));
+
+        if (!isAuthenticated()) {
+          showError('Please sign in to edit stories.');
+          navigate('/signin');
+          return;
+        }
+
+        const currentUser = getUserPayload();
+        const currentUserId = currentUser?.id ?? null;
+        const storyAuthorId =
+          story?.userId ?? story?.user?.id ?? (story as any)?.user_id;
+
+        const isOwner =
+          currentUserId !== null &&
+          storyAuthorId !== undefined &&
+          storyAuthorId !== null &&
+          Number(currentUserId) === Number(storyAuthorId);
+
+        const isAdmin = currentUser?.role?.toUpperCase() === 'ADMIN';
+
+        if (!isOwner && !isAdmin) {
+          showError('You are not authorized to edit this story.');
+          navigate('/home');
+          return;
+        }
+
         setInitialValues({
           title: story.title,
           body: story.body,

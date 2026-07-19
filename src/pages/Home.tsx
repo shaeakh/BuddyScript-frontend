@@ -12,6 +12,7 @@ import RightSidebar from '@/components/feed/RightSidebar';
 import { useDeleteStory } from '@/hooks/story/useDeleteStory';
 import { useFetchStories } from '@/hooks/story/useFetchStories';
 import useToast from '@/hooks/component/useToast';
+import ThemeToggle from '@/components/layoutComponents/ThemeToggle';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -173,6 +174,9 @@ const Home = () => {
         onConfirm={confirmDelete}
         isDeleting={isDeleting}
       />
+
+      {/* Theme Toggle Button */}
+      <ThemeToggle />
     </div>
   );
 };

@@ -27,15 +27,20 @@ const userApi = {
   },
   update: async (id: number, data: UserUpdate): Promise<BaseUser> => {
     try {
-      const response = await api.put<SingleUserResponse>(
+      const response = await api.post<SingleUserResponse>(
         ENDPOINTS.users.update(id),
-        data
+        data,
+        {
+          headers: {
+            'X-HTTP-Method-Override': 'PATCH',
+          },
+        }
       );
       return response.data?.data || response.data;
     } catch (err: unknown) {
       const error = err as { response?: { status?: number } };
-      if (error?.response?.status === 405) {
-        const response = await api.patch<SingleUserResponse>(
+      if (error?.response?.status === 404 || error?.response?.status === 405) {
+        const response = await api.post<SingleUserResponse>(
           ENDPOINTS.users.update(id),
           data
         );

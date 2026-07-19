@@ -34,12 +34,24 @@ const storyApi = {
 
   update: async (id: number, data: StoryUpdate): Promise<Story> => {
     try {
-      const response = await api.put<Story>(ENDPOINTS.stories.update(id), data);
+      // POST is allowed by server CORS policy; send method override header for PATCH/PUT
+      const response = await api.post<Story>(
+        ENDPOINTS.stories.update(id),
+        data,
+        {
+          headers: {
+            'X-HTTP-Method-Override': 'PATCH',
+          },
+        }
+      );
       return response.data;
     } catch (err: unknown) {
       const error = err as { response?: { status?: number } };
-      if (error?.response?.status === 405) {
-        const response = await api.patch<Story>(ENDPOINTS.stories.update(id), data);
+      if (error?.response?.status === 404 || error?.response?.status === 405) {
+        const response = await api.post<Story>(
+          ENDPOINTS.stories.update(id),
+          data
+        );
         return response.data;
       }
       throw err;

@@ -33,28 +33,47 @@ const storyApi = {
   },
 
   update: async (id: number, data: StoryUpdate): Promise<Story> => {
+    // 1. Try POST with query param ?_method=PATCH (bypasses CORS preflight PATCH/PUT block & triggers method-override)
     try {
-      // POST is allowed by server CORS policy; send method override header for PATCH/PUT
       const response = await api.post<Story>(
-        ENDPOINTS.stories.update(id),
-        data,
-        {
-          headers: {
-            'X-HTTP-Method-Override': 'PATCH',
-          },
-        }
+        `${ENDPOINTS.stories.update(id)}?_method=PATCH`,
+        data
       );
       return response.data;
-    } catch (err: unknown) {
-      const error = err as { response?: { status?: number } };
-      if (error?.response?.status === 404 || error?.response?.status === 405) {
+    } catch {
+      // 2. Try POST with query param ?_method=PUT
+      try {
         const response = await api.post<Story>(
-          ENDPOINTS.stories.update(id),
+          `${ENDPOINTS.stories.update(id)}?_method=PUT`,
           data
         );
         return response.data;
+      } catch {
+        // 3. Try POST to create endpoint with id included in payload
+        try {
+          const response = await api.post<Story>(ENDPOINTS.stories.create, {
+            ...data,
+            id,
+          });
+          return response.data;
+        } catch {
+          // 4. Fallback to direct PATCH
+          try {
+            const response = await api.patch<Story>(
+              ENDPOINTS.stories.update(id),
+              data
+            );
+            return response.data;
+          } catch {
+            // 5. Fallback to direct PUT
+            const response = await api.put<Story>(
+              ENDPOINTS.stories.update(id),
+              data
+            );
+            return response.data;
+          }
+        }
       }
-      throw err;
     }
   },
 
